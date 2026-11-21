@@ -12,12 +12,18 @@ elif os.path.exists(meta_p): salt=bytes.fromhex(json.load(open(meta_p))['salt'])
 else: salt=os.urandom(16)
 key=PBKDF2HMAC(algorithm=hashes.SHA256(),length=32,salt=salt,iterations=ITER).derive(pw)
 g=AESGCM(key)
-def enc(b):
+def enc(b,path=None):
+    # keep the existing file when its content is unchanged, so GitHub only stores what changed
+    if path and os.path.exists(path):
+        old=open(path,'rb').read()
+        try:
+            if g.decrypt(old[:12],old[12:],None)==b: return old
+        except Exception: pass
     iv=os.urandom(12);return iv+g.encrypt(iv,b,None)
 os.makedirs(os.path.join(out,'audio'),exist_ok=True)
 items=json.load(open(items_p))
-open(os.path.join(out,'data.enc'),'wb').write(enc(json.dumps(items,ensure_ascii=False,separators=(',',':')).encode()))
+dp=os.path.join(out,'data.enc');d=enc(json.dumps(items,ensure_ascii=False,separators=(',',':')).encode(),dp);open(dp,'wb').write(d)
 for it in items:
-    open(os.path.join(out,'audio',it['id']+'.enc'),'wb').write(enc(open(os.path.join(audio_d,it['id']+'.mp3'),'rb').read()))
+    ap=os.path.join(out,'audio',it['id']+'.enc');d=enc(open(os.path.join(audio_d,it['id']+'.mp3'),'rb').read(),ap);open(ap,'wb').write(d)
 json.dump({'v':1,'salt':salt.hex(),'iter':ITER},open(meta_p,'w'))
 print('items',len(items))

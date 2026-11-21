@@ -162,6 +162,10 @@ details.manual{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
 .recrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;min-height:24px}
 .minibtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 12px;font-size:12px;flex:none}
 .counter{margin-top:2px}
+.datehdr{font-size:12px;color:var(--muted);font-weight:700;margin:10px 2px 0}
+.recitem{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.recitem .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:11px;background:var(--good);color:#fff;border-radius:999px;padding:0 8px}
 .recrow.rec-on{background:var(--bad);color:#fff;border-radius:12px;padding:6px 6px 6px 12px;font-weight:700}
 .stopbtn{background:#fff;color:var(--bad);border:0;border-radius:999px;padding:6px 14px;font-weight:700;flex:none}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
@@ -210,7 +214,7 @@ async function flush(k){if(!(k in pend))return;const v=pend[k];delete pend[k];tr
  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PFX)&&k!==PFX+'cat'){const id=k.slice(PFX.length);if(!snap.docs.some(d=>d.id===id)){pend[id]=JSON.parse(localStorage.getItem(k));flush(id)}}}}catch(e){}
  rerender();}catch(e){}})();
 // ---------- settings & 4-day progress ----------
-const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true,wa:true,boost:2};
+const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true,wa:true,boost:2,ec:false};
 function S(){return Object.assign({},DEF,LS.get('set',{}))}
 function setS(p){LS.set('set',Object.assign(S(),p))}
 function prog(id){const p=(LS.get('prog',{}))[id]||{};return {days:Object.assign({},p.days||{})}}
@@ -229,7 +233,7 @@ function renderHome(){
  const root=$('home');root.innerHTML='';
  const t=LS.get('log-'+today(),{sec:0});let streak=0;for(let i=0;i<60;i++){const d=new Date();d.setDate(d.getDate()-i);const v=LS.get('log-'+ymd(d),null);if(v&&v.sec>=60)streak++;else if(i>0)break}
  const done=ITEMS.filter(it=>subDays(it.id)>=4).length;
- root.append(h('div',{class:'hometop'},h('h1',{text:'TOEFL シャドーイング'}),h('button',{class:'iconbtn',type:'button','aria-label':'設定',html:ICON.gear,onclick:openSheet})),h('div',{class:'small muted',text:'1つの音声を4日間。聞く → 重ねる → 追いかける → 録音して添削'}),
+ root.append(h('div',{class:'hometop'},h('h1',{text:'TOEFL シャドーイング'}),h('div',{class:'row',style:'gap:6px;margin:0'},h('button',{class:'minibtn',type:'button',text:'録音一覧',onclick:renderRecList}),h('button',{class:'iconbtn',type:'button','aria-label':'設定',html:ICON.gear,onclick:openSheet}))),h('div',{class:'small muted',text:'1つの音声を4日間。聞く → 重ねる → 追いかける → 録音して添削'}),
   h('div',{class:'stats'},
    h('div',{class:'stat'},h('div',{class:'small muted',text:'今日'}),h('b',{class:'num',text:Math.round((t.sec||0)/60)+'分'})),
    h('div',{class:'stat'},h('div',{class:'small muted',text:'連続日数'}),h('b',{class:'num',text:streak+'日'})),
@@ -441,6 +445,8 @@ au.addEventListener('ended',()=>{if(waiting)return;if(A!=null&&B!=null){au.curre
 // ---------- recording (kept in this browser) ----------
 const IDB={db:null,open(){return this.db||(this.db=new Promise((res,rej)=>{const r=indexedDB.open('shd-rec',1);r.onupgradeneeded=()=>r.result.createObjectStore('rec');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
  async put(k,v){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction('rec','readwrite');t.objectStore('rec').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})},
+ async all(){const d=await this.open();return new Promise((res,rej)=>{const out=[];const q=d.transaction('rec').objectStore('rec').openCursor();q.onsuccess=()=>{const c=q.result;if(c){out.push({k:c.key,v:c.value});c.continue()}else res(out)};q.onerror=()=>rej(q.error)})},
+ async del(k){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction('rec','readwrite');t.objectStore('rec').delete(k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})},
  async get(k){const d=await this.open();return new Promise((res,rej)=>{const q=d.transaction('rec').objectStore('rec').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}};
 const recKey=id=>id+'|'+today();
 let REC=null,RECMSG='',recT0=0;
@@ -451,7 +457,7 @@ async function startRec(){
  try{const p=au.play();if(p&&p.then)p.then(()=>au.pause()).catch(()=>{})}catch(e){}
  if(!navigator.mediaDevices||!window.MediaRecorder){recMsg('このブラウザは録音に対応していません。iPhone なら Safari で開いてください。');return}
  setAudioSession('play-and-record');
- let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}catch(e){setAudioSession('auto');recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
+ let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:S().ec?{echoCancellation:true,noiseSuppression:true,autoGainControl:true}:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}catch(e){setAudioSession('auto');recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
  const mr=new MediaRecorder(stream,type?{mimeType:type}:undefined);const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
  REC={stream,mr,id:IT.id,chunks,type,done:false};recT0=Date.now();
@@ -540,6 +546,29 @@ async function listModels(out){const st=S();if(!st.gkey){out.textContent='API �
 function backupOut(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(PFX)&&k!==PFX+'set')o[k]=localStorage.getItem(k)}}catch(e){}
  const f=new Blob([JSON.stringify(o)],{type:'application/json'});const a=h('a',{href:URL.createObjectURL(f),download:'shadowing-backup-'+today()+'.json'});document.body.append(a);a.click();a.remove()}
 function backupIn(file,out){const fr=new FileReader();fr.onload=()=>{try{const o=JSON.parse(fr.result);let n=0;Object.keys(o).forEach(k=>{if(k.startsWith(PFX)){localStorage.setItem(k,o[k]);delete MEM[k.slice(PFX.length)];n++}});out.textContent=n+'件を読み込みました。';rerender()}catch(e){out.textContent='読み込めませんでした。'}};fr.readAsText(file)}
+// ---------- recordings list ----------
+const listAu=new Audio();let listUrl=null,listBtn=null;
+async function renderRecList(){
+ const root=$('home');root.innerHTML='';
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'一覧に戻る',html:ICON.back,onclick:()=>{listAu.pause();renderHome()}}),h('div',{class:'ttl'},h('div',{text:'録音一覧'}),h('div',{class:'small muted',text:'この端末に保存された録音（1素材1日1つ）'}))));
+ const box=h('div',{class:'list',style:'margin-top:12px'});root.append(box);
+ let rs=[];try{rs=await IDB.all()}catch(e){box.append(h('p',{class:'small muted',text:'録音を読み込めませんでした。'}));return}
+ if(!rs.length){box.append(h('p',{class:'small muted',text:'まだ録音がありません。素材を開いて「● 録音」で録音できます。'}));return}
+ rs.sort((a,b)=>(b.v.at||0)-(a.v.at||0));
+ const fball=LS.get('fb',{});let lastDate='';
+ rs.forEach(r=>{const [id,date]=String(r.k).split('|');const it=ITEMS.find(x=>x.id===id);const title=it?it.title:id;
+  if(date!==lastDate){box.append(h('div',{class:'datehdr num',text:date}));lastDate=date}
+  const graded=(fball[id]||[]).some(f=>f.date===date);
+  const pb=h('button',{class:'minibtn',type:'button',text:'▶ 聞く'});
+  pb.onclick=()=>{if(listBtn===pb&&!listAu.paused){listAu.pause();pb.textContent='▶ 聞く';return}
+   if(listBtn)listBtn.textContent='▶ 聞く';if(listUrl)URL.revokeObjectURL(listUrl);listUrl=URL.createObjectURL(r.v.blob);listAu.src=listUrl;listBtn=pb;listAu.onended=()=>{pb.textContent='▶ 聞く'};listAu.play().then(()=>{pb.textContent='■ 止める'}).catch(()=>{})};
+  const del=h('button',{class:'linkbtn small',type:'button',text:'削除'});
+  del.onclick=async()=>{if(!del.dataset.arm){del.dataset.arm='1';del.textContent='もう一度押すと削除';return}await IDB.del(r.k).catch(()=>{});renderRecList()};
+  const open=h('button',{class:'linkbtn small',type:'button',text:'開く',onclick:()=>{listAu.pause();if(it)openItem(id)}});
+  const dur=h('span',{class:'small muted num',text:''});
+  const tmp=new Audio();tmp.preload='metadata';const u=URL.createObjectURL(r.v.blob);tmp.src=u;tmp.onloadedmetadata=()=>{if(isFinite(tmp.duration))dur.textContent=fmt(tmp.duration);URL.revokeObjectURL(u)};
+  box.append(h('div',{class:'recitem'},h('div',{style:'min-width:0;flex:1'},h('div',{class:'t',text:title}),h('div',{class:'row',style:'gap:10px;margin:2px 0 0'},dur,graded?h('span',{class:'badge',text:'添削済み'}):null,open,del)),pb))});
+}
 // ---------- settings sheet ----------
 function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
  if(!IT){sh.append(...gemSettings(),h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));sh.hidden=false;$('shade').hidden=false;return}
@@ -554,6 +583,8 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('p',{class:'small muted',text:'「文の長さ＋1秒」は Listen & Repeat の本番と同じ考え方。聞いた文と同じ長さの間に言い切る。'}),
   (()=>{const r=h('input',{type:'range',id:'boost',min:1,max:3,step:0.25,value:st.boost,'aria-label':'録音中の音量'});const v=h('b',{class:'num',text:'×'+(+st.boost).toFixed(2)});r.oninput=()=>{setS({boost:+r.value});v.textContent='×'+(+r.value).toFixed(2);if(GAIN&&REC)GAIN.gain.value=+r.value};return h('div',{class:'row'},h('span',{text:'録音中の音量'}),r,v)})(),
   h('div',{class:'row'},h('span',{text:'音の途切れ対策'}),seg('wa',[[true,'オン'],[false,'オフ']])),
+  h('div',{class:'row'},h('span',{text:'イヤホン'}),seg('ec',[[false,'あり'],[true,'なし']])),
+  h('p',{class:'small muted',text:'イヤホンなしにすると、録音にお手本の音が入りにくくなる代わりに、iPhone がお手本の音量を下げます。添削の精度はイヤホンありの方が上です。'}),
   h('p',{class:'small muted',text:'オンだと再生の最初が切れにくく、録音中の音量も上げられます。音が出なくなったらオフにして、ページを読み込み直してください。'}),
   h('h3',{text:'表示',style:'margin-top:12px'}),
   h('div',{class:'row'},h('span',{text:'文字の大きさ'}),fs),
