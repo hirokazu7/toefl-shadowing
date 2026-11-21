@@ -1,0 +1,550 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-capable" content="yes"><title>TOEFL シャドーイング</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: list of materials → one-screen player with script on top, fixed transport at the bottom. Highlighter marks the line being spoken. */
+:root{
+  --bg:#f5f6f9;--surface:#ffffff;--ink:#16203a;--muted:#5f6b85;--line:#dfe3ec;
+  --accent:#2f56d0;--accent-ink:#ffffff;--mark:#ffe58a;--mark-ink:#16203a;--good:#1f8a5b;--bad:#c2413b;--chip:#e9edf8;
+  --en:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --ja:'Noto Sans JP','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+  --fs:20px;--mF:#c9620f;--mD:#7a68b8;--mL:#1d8496;--goodbg:#e8f5ee;--devbg:#fbecea;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1422;--surface:#171e30;--ink:#e6eaf4;--muted:#9aa6c2;--line:#2a3350;--accent:#7f9cff;--accent-ink:#0f1422;--mark:#5a4a12;--mark-ink:#fff6d6;--good:#4fc28d;--bad:#ff7a73;--chip:#222b45;--mF:#ffab5c;--mD:#b3a6ff;--mL:#5fd0e2;--goodbg:#15302a;--devbg:#3a1f22;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1422;--surface:#171e30;--ink:#e6eaf4;--muted:#9aa6c2;--line:#2a3350;--accent:#7f9cff;--accent-ink:#0f1422;--mark:#5a4a12;--mark-ink:#fff6d6;--good:#4fc28d;--bad:#ff7a73;--chip:#222b45;--mF:#ffab5c;--mD:#b3a6ff;--mL:#5fd0e2;--goodbg:#15302a;--devbg:#3a1f22;color-scheme:dark}
+html,body{height:100%}
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:15px}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--ja);font-size:15px;line-height:1.6;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding-block:14px 24px}
+h1{font-size:20px;margin:4px 0 2px;text-wrap:balance}
+.muted{color:var(--muted)}.small{font-size:13px}
+.en{font-family:var(--en)}
+.num{font-variant-numeric:tabular-nums;font-family:var(--en)}
+/* home */
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:0}
+.stat b{font-size:18px}
+.cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.cats button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;white-space:nowrap;font-size:14px}
+.cats button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:grid;gap:8px}
+.item{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%}
+.item .t{font-weight:700;min-width:0}
+.item .meta{font-size:12px;color:var(--muted)}
+.dots{display:flex;gap:4px;margin-left:auto;flex:none}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--good)}
+.catnote{font-size:13px;color:var(--muted);margin:-2px 0 10px}
+/* player */
+.player{display:flex;flex-direction:column;height:100%}
+.top{display:flex;align-items:center;gap:8px;padding-top:10px}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+.top .ttl{min-width:0;flex:1}
+.top .ttl>div:first-child{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:10px 0 6px}
+.steps button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 2px;font-size:12px;line-height:1.3;white-space:nowrap}
+.steps button .n{display:block;font-family:var(--en);font-weight:700;font-size:13px}
+.steps button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}
+.steps button.done .n::after{content:" ✓";color:var(--good)}
+.guide{background:var(--chip);border-radius:10px;padding:8px 12px;font-size:13px}
+.guide b{font-weight:700}
+.views{display:flex;gap:4px;margin:8px 0;flex-wrap:wrap}
+.views button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;font-size:13px}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.script{flex:1;overflow-y:auto;min-height:0;padding:4px 2px 12px;-webkit-overflow-scrolling:touch}
+.q{font-family:var(--en);font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:4px 0 10px}
+.ln{display:block;width:100%;text-align:left;border:0;background:none;padding:6px 6px;border-radius:8px;margin:0 0 2px}
+.ln .e{font-family:var(--en);font-size:var(--fs);line-height:1.5}
+.ln .j{font-size:calc(var(--fs)*.72);color:var(--muted);line-height:1.5;margin-top:2px}
+.ln .who{font-family:var(--en);font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.ln.cur{background:var(--mark);color:var(--mark-ink)}
+.ln.cur .j,.ln.cur .who{color:var(--mark-ink)}
+.ln.loop{box-shadow:inset 3px 0 0 var(--accent)}
+.mask{color:transparent;border-bottom:2px solid var(--muted)}
+.ln.cur .mask{border-bottom-color:var(--mark-ink)}
+.hiddenbox{border:1px dashed var(--line);border-radius:12px;padding:28px 12px;text-align:center;color:var(--muted);margin:20px 0}
+.notes{margin:14px 0 6px;font-size:13px}
+.notes summary{cursor:pointer;color:var(--muted)}
+.notes li{font-family:var(--en)}
+.fb{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.fbrow{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:13px}
+.fbrow .k{display:flex;gap:12px;flex-wrap:wrap}
+.miss{color:var(--bad);font-family:var(--en)}
+.dict{margin-top:6px;font-size:14px}
+.dict .ok{color:var(--good)}.dict .ng{color:var(--bad);text-decoration:underline}
+/* transport */
+.bar{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px))}
+.seek{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.seek input{flex:1;accent-color:var(--accent);min-width:0}
+.ctrls{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:4px}
+.ctrls .iconbtn{width:46px;height:46px}
+.play{width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.tog[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lbl{font-family:var(--en);font-size:11px;font-weight:700}
+.ab{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:6px;font-size:13px}
+.ab button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 12px}
+.counter{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+/* sheet */
+.sheet{position:fixed;inset:auto 0 0 0;background:var(--surface);border-top:1px solid var(--line);border-radius:16px 16px 0 0;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));z-index:20;box-shadow:0 -8px 30px rgba(0,0,0,.18);max-height:80vh;overflow-y:auto}
+.sheet h3{margin:0 0 4px;font-size:14px;color:var(--accent)}
+.row{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap}
+.row>span:first-child{min-width:92px;font-size:14px}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;border-radius:8px;padding:5px 10px;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.row input[type=range]{flex:1;accent-color:var(--accent);min-width:120px}
+.shade{position:fixed;inset:0;background:rgba(10,14,25,.35);z-index:19}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.cur-card{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:10px 14px;margin:0 0 14px}
+.cur-card .t{font-weight:700;font-size:16px}
+.steps .cnt{display:block;font-size:11px;color:var(--muted);min-height:1em}
+.views .mkbtn{margin-left:auto}
+.views .mkbtn[aria-pressed="true"]{background:var(--surface);color:var(--ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin:2px 6px 8px}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.bd{font-style:normal;font-size:11px;font-weight:700;width:18px;height:18px;border-radius:5px;display:inline-grid;place-items:center;color:#fff;flex:none}
+.bF{background:var(--mF)}.bD{background:var(--mD)}.bL{background:var(--mL)}
+.mk{text-decoration-line:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.mF{text-decoration-style:wavy;text-decoration-color:var(--mF)}
+.mD{text-decoration-style:dotted;text-decoration-color:var(--mD);text-decoration-thickness:3px}
+.mL{text-decoration-style:solid;text-decoration-color:var(--mL)}
+.kc-row{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:4px}
+.kc{display:inline-flex;align-items:center;gap:4px;font-size:12px;background:var(--chip);border-radius:6px;padding:1px 6px 1px 2px;line-height:1.6}
+.ln.cur .kc{background:rgba(255,255,255,.45)}
+.fb.fbtop{border-top:0;padding-top:0;margin:0 0 12px}
+details.fbrow summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+details.fbrow .k{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted)}
+details.fbrow .k b{color:var(--ink)}
+.gd,.dv{margin-top:8px;border-radius:10px;padding:8px 10px}
+.gd{background:var(--goodbg)}.dv{background:var(--devbg)}
+.tag{display:inline-block;font-family:var(--en);font-weight:700;font-size:12px;border-radius:999px;padding:1px 10px;color:#fff}
+.tag.good{background:var(--good)}.tag.dev{background:var(--bad)}
+.pt{padding:6px 0;border-top:1px solid var(--line)}
+.pt:first-of-type{border-top:0}
+.pt .ph{font-weight:600}
+.pastebox{width:100%;min-height:120px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);color:var(--ink);font:13px/1.5 var(--ja)}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:2px 0}
+details.heard{margin-top:6px}
+.recrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.recbtn{border:1.5px solid var(--bad);color:var(--bad);background:var(--surface);border-radius:999px;padding:6px 16px;font-weight:700}
+.recbtn.on{background:var(--bad);color:#fff}
+.myrec{margin:8px 0}.myrec audio{width:100%;margin-top:4px}
+details.manual{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.hometop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheet input[type=password]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--ink)}
+.sheet select{max-width:100%}
+.passin{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:16px;background:var(--surface);color:var(--ink);flex:1;min-width:0}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head><body><div id="home" class="wrap"></div>
+<div id="player" class="wrap player" hidden></div>
+<div id="shade" class="shade" hidden></div>
+<div id="sheet" class="sheet" hidden role="dialog" aria-label="再生設定"></div>
+<audio id="au" preload="auto"></audio>
+<script>
+let ITEMS=[];
+const CATS=[['lr','Listen & Repeat','本番と同じ形。1文聞いて、間に同じ文を言う。'],['intv','Interview お手本','型をそのまま口に入れる。Q1は事実型、Q2〜Q4は意見型。'],['talk','講義','Academic Talk。Listening で一番配点が大きい形式。'],['conv','会話','Conversation。2人の声の切り替わりに付いていく。'],['ann','アナウンス','Announcement。日時・場所・変更点を聞き取る。']];
+// day plans: [key, label, target, guide]
+const PLAN1=[
+ ['c','内容確認',1,'<b>内容確認：英文を見ずに</b>1回聞く。わからなかった所は「英＋和」で確認。'],
+ ['o','重ね読み',3,'<b>オーバーラッピング：英文を見ながら</b>音声と同時に読む。速さとリズムをつかむ。'],
+ ['s','シャドー',5,'<b>シャドーイング：英文を隠して</b>2〜3語遅れで追いかける。イヤホン必須。'],
+ ['sub','提出',1,'<b>提出：</b>「● 録音しながら再生」で録音し、「Gemini で添削」を押す。']];
+const PLAN2=[
+ ['fb','添削確認',1,'<b>添削確認：</b>前回の Development を読み、その部分を英文で確かめてから練習する。（3分）'],
+ ['s','シャドー',20,'<b>シャドーイング：英文を隠して</b>同じ音声を20〜25回。直す所を1つ決めて追いかける。'],
+ ['sub','提出',1,'<b>提出：</b>「● 録音しながら再生」で録音し、「Gemini で添削」を押す。']];
+const MKN={F:['ラ','T・Dがラ行っぽくなる'],D:['消','音が消える・弱まる'],L:['つ','つながる']};
+const $=id=>document.getElementById(id);
+function h(tag,p,...kids){const e=document.createElement(tag);if(p)for(const k in p){const v=p[k];if(v==null||v===false)continue;if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?'':v)}kids.flat().forEach(c=>{if(c==null||c===false)return;e.appendChild(typeof c==='string'?document.createTextNode(c):c)});return e}
+const fmt=s=>{s=Math.max(0,s);return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')};
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>ymd(new Date());
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const ICON={
+ back:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+ gear:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+ play:'<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+ pause:'<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
+ prev:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 5v14M18 6l-8 6 8 6z"/></svg>',
+ next:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 5v14M6 6l8 6-8 6z"/></svg>'};
+// ---------- storage: browser + private per-user store ----------
+const PFX='shd:',MEM={};let COL=null;const pend={},tmr={};
+const LS={get(k,d){if(k in MEM)return MEM[k];try{const v=localStorage.getItem(PFX+k);if(v!=null){MEM[k]=JSON.parse(v);return MEM[k]}}catch(e){}return d},
+ set(k,v){MEM[k]=v;try{localStorage.setItem(PFX+k,JSON.stringify(v))}catch(e){}if(COL){pend[k]=v;clearTimeout(tmr[k]);tmr[k]=setTimeout(()=>flush(k),700)}}};
+async function flush(k){if(!(k in pend))return;const v=pend[k];delete pend[k];try{await COL.doc(k).set({v:JSON.stringify(v)})}catch(e){}}
+(async()=>{try{if(!window.claude||!window.claude.use)return;const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;
+ const uid=await user.id();if(!uid)return;const col=db.collection('data/users/'+uid);const snap=await col.get();
+ snap.docs.forEach(d=>{const b=d.data();if(b&&typeof b.v==='string'){try{MEM[d.id]=JSON.parse(b.v);localStorage.setItem(PFX+d.id,b.v)}catch(e){}}});
+ COL=col;
+ try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PFX)&&k!==PFX+'cat'){const id=k.slice(PFX.length);if(!snap.docs.some(d=>d.id===id)){pend[id]=JSON.parse(localStorage.getItem(k));flush(id)}}}}catch(e){}
+ rerender();}catch(e){}})();
+// ---------- settings & 4-day progress ----------
+const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true};
+function S(){return Object.assign({},DEF,LS.get('set',{}))}
+function setS(p){LS.set('set',Object.assign(S(),p))}
+function prog(id){const p=(LS.get('prog',{}))[id]||{};return {days:Object.assign({},p.days||{})}}
+function dayKeys(id){return Object.keys(prog(id).days).sort()}
+function dayNo(id){const ks=dayKeys(id),t=today();const i=ks.indexOf(t);return i>=0?i+1:ks.length+1}
+function planFor(n){return n<=1?PLAN1:PLAN2}
+function todayRec(id){return Object.assign({},prog(id).days[today()]||{})}
+function bump(id,key,v){const all=Object.assign({},LS.get('prog',{}));const p=prog(id);const d=Object.assign({},p.days[today()]||{});d[key]=v==null?(d[key]||0)+1:v;p.days[today()]=d;all[id]=p;LS.set('prog',all)}
+function dayDone(n,rec){return planFor(n).every(([k,,t])=>(rec[k]||0)>=t)}
+function subDays(id){const p=prog(id);return dayKeys(id).filter(k=>(p.days[k].sub||0)>0).length}
+function logSec(sec,id){const k='log-'+today();const L=Object.assign({sec:0,items:{}},LS.get(k,{}));L.sec=Math.round(L.sec+sec);L.items[id]=Math.round((L.items[id]||0)+sec);LS.set(k,L)}
+function fbFor(id){const f=LS.get('fb',{});return (f&&f[id])||[]}
+// ---------- home ----------
+let curCat=(()=>{try{return localStorage.getItem(PFX+'cat')||'lr'}catch(e){return 'lr'}})();
+function renderHome(){
+ const root=$('home');root.innerHTML='';
+ const t=LS.get('log-'+today(),{sec:0});let streak=0;for(let i=0;i<60;i++){const d=new Date();d.setDate(d.getDate()-i);const v=LS.get('log-'+ymd(d),null);if(v&&v.sec>=60)streak++;else if(i>0)break}
+ const done=ITEMS.filter(it=>subDays(it.id)>=4).length;
+ root.append(h('div',{class:'hometop'},h('h1',{text:'TOEFL シャドーイング'}),h('button',{class:'iconbtn',type:'button','aria-label':'設定',html:ICON.gear,onclick:openSheet})),h('div',{class:'small muted',text:'1つの音声を4日間。聞く → 重ねる → 追いかける → 録音して添削'}),
+  h('div',{class:'stats'},
+   h('div',{class:'stat'},h('div',{class:'small muted',text:'今日'}),h('b',{class:'num',text:Math.round((t.sec||0)/60)+'分'})),
+   h('div',{class:'stat'},h('div',{class:'small muted',text:'連続日数'}),h('b',{class:'num',text:streak+'日'})),
+   h('div',{class:'stat'},h('div',{class:'small muted',text:'4日完了'}),h('b',{class:'num',text:done+' / '+ITEMS.length}))));
+ // current item
+ const active=ITEMS.map(it=>({it,ks:dayKeys(it.id)})).filter(x=>x.ks.length&&subDays(x.it.id)<4).sort((a,b)=>b.ks[b.ks.length-1].localeCompare(a.ks[a.ks.length-1]));
+ if(active.length){const it=active[0].it,n=Math.min(dayNo(it.id),4),rec=todayRec(it.id),fin=dayDone(dayNo(it.id),rec);
+  root.append(h('button',{class:'cur-card',type:'button',onclick:()=>openItem(it.id)},
+   h('div',{class:'small',text:fin?'今日のぶんは完了':'取り組み中'}),h('div',{class:'t',text:it.title}),
+   h('div',{class:'num small',text:'Day '+n+' / 4・今日のシャドーイング '+(rec.s||0)+' / '+planFor(n).find(p=>p[0]==='s')[2]+'回'+(rec.sub?'・提出済み':'')})))}
+ const cats=h('div',{class:'cats',role:'tablist'});
+ CATS.forEach(([k,n])=>cats.append(h('button',{type:'button','aria-pressed':String(k===curCat),text:n+' '+ITEMS.filter(i=>i.cat===k).length,onclick:()=>{curCat=k;try{localStorage.setItem(PFX+'cat',k)}catch(e){}renderHome()}})));
+ root.append(cats,h('p',{class:'catnote',text:CATS.find(c=>c[0]===curCat)[2]}));
+ const list=h('div',{class:'list'});
+ ITEMS.filter(i=>i.cat===curCat).forEach(it=>{const sd=subDays(it.id),fb=fbFor(it.id);
+  list.append(h('button',{class:'item',type:'button',onclick:()=>openItem(it.id)},
+   h('div',{style:'min-width:0'},h('div',{class:'t',text:it.title}),h('div',{class:'meta num',text:fmt(it.dur)+'・'+it.words+'語・'+Math.round(it.words/it.dur*60)+' WPM'+(fb.length?'・添削 '+fb.length+'回':'')})),
+   h('div',{class:'dots','aria-label':'提出した日 '+sd+' / 4'},[0,1,2,3].map(i=>h('i',{class:i<sd?'on':''})))))});
+ root.append(list,h('p',{class:'small muted',style:'margin-top:16px',text:'丸は提出した日数（4日で完了）。1日目は内容確認から、2〜4日目は添削確認 → シャドーイング20回 → 提出。'}));
+}
+// ---------- player ----------
+const au=$('au');let IT=null,DAY=1,step=0,cur=-1,loop=false,A=null,B=null,waiting=null,raf=0,lastT=0,heard=0;
+function openItem(id){IT=ITEMS.find(i=>i.id===id);DAY=dayNo(id);const plan=planFor(DAY),rec=todayRec(id);step=plan.findIndex(([k,,t])=>(rec[k]||0)<t);if(step<0)step=plan.findIndex(p=>p[0]==='s');
+ cur=-1;loop=false;A=B=null;clearWait();au.removeAttribute('src');audioUrl(id).then(u=>{if(IT&&IT.id===id){au.src=u;au.load()}}).catch(()=>{});au.playbackRate=S().rate;try{au.preservesPitch=true}catch(e){}
+ $('home').hidden=true;$('player').hidden=false;applyStepView();renderPlayer();window.scrollTo(0,0)}
+function closeItem(){au.pause();clearWait();flushHeard();$('player').hidden=true;$('home').hidden=false;IT=null;renderHome()}
+function stepKey(){return planFor(DAY)[step][0]}
+function applyStepView(){const k=stepKey();const v={c:'hide',o:'en',s:'hide',sub:'hide',fb:'en'}[k];setS({view:v,pause:(IT.cat==='lr'&&k!=='o')?'len':'off'})}
+function renderPlayer(){
+ const root=$('player');root.innerHTML='';const st=S(),plan=planFor(DAY),rec=todayRec(IT.id),k=stepKey();
+ root.style.setProperty('--fs',st.fs+'px');
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'一覧に戻る',html:ICON.back,onclick:closeItem}),
+  h('div',{class:'ttl'},h('div',{text:IT.title}),h('div',{class:'small muted num',text:(DAY>4?'復習（4日完了済み）':'Day '+DAY+' / 4')})),
+  h('button',{class:'iconbtn',type:'button','aria-label':'再生設定',html:ICON.gear,onclick:openSheet})));
+ const steps=h('div',{class:'steps',style:'grid-template-columns:repeat('+plan.length+',1fr)'});
+ plan.forEach(([kk,n,t],i)=>{const got=rec[kk]||0;steps.append(h('button',{type:'button','aria-pressed':String(i===step),class:got>=t?'done':'',onclick:()=>{step=i;applyStepView();renderPlayer()}},h('span',{class:'n',text:String(i+1)}),n,h('span',{class:'cnt num',text:t>1?got+'/'+t:(got?'済':'')})))});
+ root.append(steps,h('div',{class:'guide',html:plan[step][3]}));
+ const views=h('div',{class:'views'});[['en','英文'],['both','英＋和'],['ja','和訳'],['gap','穴あき'],['hide','隠す']].forEach(([kk,n])=>views.append(h('button',{type:'button','aria-pressed':String(st.view===kk),text:n,onclick:()=>{setS({view:kk});renderPlayer()}})));
+ views.append(h('button',{type:'button',class:'mkbtn','aria-pressed':String(st.mk),text:'音の変化',onclick:()=>{setS({mk:!S().mk});renderPlayer()}}));
+ root.append(views);
+ const sc=h('div',{class:'script',id:'script'});
+ if(k==='fb')sc.append(fbBox(true));
+ if(IT.q)sc.append(h('div',{class:'q',text:'Q. '+IT.q}));
+ const showMk=st.mk&&(st.view==='en'||st.view==='both');
+ if(showMk)sc.append(h('div',{class:'legend'},Object.entries(MKN).map(([t,[a,b]])=>h('span',null,h('i',{class:'bd b'+t,text:a}),b))));
+ if(st.view==='hide'){sc.append(h('div',{class:'hiddenbox',html:'英文を隠しています<br><span class="small">'+(cur>=0?'いま '+(cur+1)+' / '+IT.lines.length+' 文目':'再生ボタンで開始')+'</span>'}))}
+ else{const vs=IT.cat==='conv'?[...new Set(IT.lines.map(l=>l.v))]:[];
+  IT.lines.forEach((l,i)=>{const b=h('button',{type:'button',class:'ln'+(i===cur?' cur':'')+(loop&&i===cur?' loop':''),id:'ln'+i,onclick:()=>jump(i)});
+   if(vs.length>1)b.append(h('div',{class:'who',text:'Speaker '+'AB'[vs.indexOf(l.v)]}));
+   if(st.view!=='ja'){const e=h('div',{class:'e'});if(st.view==='gap')e.innerHTML=gapify(l.en);else if(showMk)e.innerHTML=markup(l);else e.textContent=l.en;b.append(e)}
+   if(showMk&&l.mk&&l.mk.length)b.append(h('div',{class:'kc-row'},l.mk.map(m=>h('span',{class:'kc'},h('i',{class:'bd b'+m[2],text:MKN[m[2]][0]}),h('span',{class:'en',text:m[3]}),' → ',m[4]))));
+   if(st.view==='both'||st.view==='ja')b.append(h('div',{class:'j',text:l.ja}));sc.append(b)})}
+ if(k==='sub')sc.append(submitBox());
+ if(k!=='fb')sc.append(fbBox(false));
+ root.append(sc);
+ // transport
+ const bar=h('div',{class:'bar'});
+ const rng=h('input',{type:'range',id:'seek',min:0,max:IT.dur,step:0.1,value:au.currentTime||0,'aria-label':'再生位置',oninput:e=>{clearWait();au.currentTime=+e.target.value;}});
+ bar.append(h('div',{class:'seek'},h('span',{class:'num',id:'tnow',text:fmt(au.currentTime||0)}),rng,h('span',{class:'num',text:'-'+fmt(IT.dur-(au.currentTime||0)),id:'tleft'})));
+ const pb=h('button',{class:'play',type:'button',id:'pb','aria-label':'再生',html:au.paused&&!waiting?ICON.play:ICON.pause,onclick:toggle});
+ bar.append(h('div',{class:'ctrls'},
+  h('button',{class:'iconbtn tog',type:'button','aria-pressed':String(loop),'aria-label':'この文をくり返す',title:'この文をくり返す',onclick:()=>{loop=!loop;if(loop&&cur<0)cur=0;renderPlayer()}},h('span',{class:'lbl',text:'1文'})),
+  h('button',{class:'iconbtn',type:'button','aria-label':'前の文',html:ICON.prev,onclick:()=>jump(Math.max(0,(cur<0?0:cur)-((au.currentTime-(IT.lines[cur]||{s:0}).s)>1?0:1)))}),
+  pb,
+  h('button',{class:'iconbtn',type:'button','aria-label':'次の文',html:ICON.next,onclick:()=>jump(Math.min(IT.lines.length-1,cur+1))}),
+  h('button',{class:'iconbtn tog',type:'button','aria-pressed':String(A!=null),'aria-label':'A-Bリピート',onclick:abTap},h('span',{class:'lbl',text:A==null?'A-B':(B==null?'B?':'A-B')}))));
+ bar.append(recRow());
+ const pauseTxt={off:'文ごとに止めない',len:'文ごとに止める：文の長さ＋1秒',1:'文ごとに止める：1秒',3:'文ごとに止める：3秒',5:'文ごとに止める：5秒'}[st.pause];
+ bar.append(h('div',{class:'counter num',id:'counter',text:'×'+st.rate.toFixed(2)+'（'+Math.round(IT.words/IT.dur*60*st.rate)+' WPM）・'+pauseTxt+(A!=null?'・A '+fmt(A)+(B!=null?' 〜 B '+fmt(B):''):'')}));
+ root.append(bar);
+ scrollCur();
+}
+function markup(l){const s=l.en;if(!l.mk||!l.mk.length)return esc(s);let out='',p=0;
+ l.mk.slice().sort((a,b)=>a[0]-b[0]).forEach(m=>{if(m[0]<p)return;out+=esc(s.slice(p,m[0]))+'<span class="mk m'+m[2]+'">'+esc(s.slice(m[0],m[1]))+'</span>';p=m[1]});return out+esc(s.slice(p))}
+function gapify(s){return s.split(/(\s+)/).map(w=>{const m=w.match(/^([^A-Za-z]*)([A-Za-z'’-]+)([^A-Za-z]*)$/);if(!m)return esc(w);const core=m[2];if(core.length<=3)return esc(w);return esc(m[1])+esc(core[0])+'<span class="mask">'+esc(core.slice(1))+'</span>'+esc(m[3])}).join('')}
+function geminiPrompt(){
+ const L=IT.lines.map(l=>l.en).join('\n');
+ const mk=[];IT.lines.forEach(l=>(l.mk||[]).forEach(m=>mk.push('- '+m[3]+' → '+m[4]+'（'+MKN[m[2]][1]+'）')));
+ return ['あなたは英語の発音とシャドーイングのコーチです。添付した音声は、私が下のスクリプトをシャドーイング（または音読）した録音です。',
+ '',
+ '手順：',
+ '1. まず音声を聞こえた通りに英語で書き起こす。推測で補わない。聞き取れない所は (?) と書く。',
+ '2. 書き起こしをスクリプトと1語ずつ比べ、スクリプトの語のうち言えていた語の割合（%）を出す。',
+ '3. 特に下の「音の変化」の箇所（T・Dがラ行っぽくなる／音が消える／つながる）ができているかを聞く。',
+ '4. 良かった点と直す点を、それぞれ最大3つ、優先度の高い順に書く。どちらもスクリプトから2〜5語のフレーズを引用する。直す点は「どう聞こえたか → どう言うとよいか」をカタカナで示す。',
+ '5. 次の練習で直す1点を1文で書く。',
+ '甘く評価しない。聞こえていない音を「できている」と書かない。',
+ '',
+ '必ず次の形だけで答える（【】の見出しは変えない。前置きや他の説明は書かない）：',
+ '【聞き取った英文】',
+ '（書き起こし）',
+ '【言えた語】（数字）%',
+ '【Good】',
+ '- （フレーズ） | （説明）',
+ '【Development】',
+ '- （フレーズ） | （説明）',
+ '【次に直す1点】',
+ '（1文）',
+ '',
+ '素材：'+IT.title+'（Day '+Math.min(DAY,4)+'）',
+ IT.q?'質問：'+IT.q:'',
+ 'スクリプト：',L,
+ '',
+ '音の変化：',mk.join('\n')].filter(x=>x!==null).join('\n')}
+function parseGemini(txt){
+ const t=txt.replace(/\r/g,'').replace(/\*\*/g,'').replace(/^#+\s*/gm,'');
+ const parts=t.split(/【([^】]+)】/);const sec={};
+ for(let i=1;i<parts.length;i+=2)sec[parts[i].trim()]=(parts[i+1]||'').trim();
+ const get=k=>{const key=Object.keys(sec).find(x=>x.replace(/\s/g,'').toLowerCase().includes(k));return key!=null?sec[key]:''};
+ const items=s=>s.split('\n').map(x=>x.trim()).filter(x=>/^[-・*•\d]/.test(x)).map(x=>x.replace(/^([-・*•]|\d+[.)．])\s*/,'')).filter(Boolean).map(x=>{const m=x.split(/\s*[|｜]\s*/);return m.length>1?{p:m[0].replace(/^["“「]|["”」]$/g,''),t:m.slice(1).join(' ')}:{p:'',t:x}});
+ const accM=get('言えた語').match(/(\d{1,3})(?:\.\d+)?\s*[%％]?/);
+ const e={date:today(),day:Math.min(DAY,4),src:'Gemini',acc:accM?Math.min(100,+accM[1]):null,heard:get('聞き取った'),good:items(get('good')),dev:items(get('development')),comment:get('次に直す')?'次に直す1点：'+get('次に直す').split('\n')[0]:''};
+ if(!e.good.length&&!e.dev.length&&e.acc==null)return null;
+ return e}
+function copyBox(text,btn,holder){
+ const done=()=>{btn.textContent='コピーしました';setTimeout(()=>{btn.textContent='Gemini 用にコピー'},1800)};
+ const fallback=()=>{holder.innerHTML='';const ta=h('textarea',{class:'pastebox',readonly:true,'aria-label':'Gemini に送る文'});ta.value=text;holder.append(h('p',{class:'small muted',text:'自動でコピーできませんでした。下の文を全部選んでコピーしてください。'}),ta);ta.focus();ta.select()};
+ try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}}
+function submitBox(){
+ const rec=todayRec(IT.id),st=S();
+ const msg=h('p',{class:'small',id:'gemMsg'});
+ const gbtn=h('button',{class:'btn primary',type:'button',text:'Gemini で添削（自動）'});gbtn.onclick=()=>geminiGrade(gbtn,msg);
+ const holder=h('div');
+ const cbtn=h('button',{class:'btn',type:'button',text:'指示をコピー'});cbtn.onclick=()=>copyBox(geminiPrompt(),cbtn,holder);
+ const sbtn=h('button',{class:'btn',type:'button',text:'録音を共有'});sbtn.onclick=()=>shareRec(msg);
+ const ta=h('textarea',{class:'pastebox',id:'gemPaste',placeholder:'Gemini アプリの返事を全部ここに貼る','aria-label':'Gemini の添削'});
+ const save=h('button',{class:'btn',type:'button',text:'添削を保存',onclick:()=>{const e=parseGemini(ta.value);if(!e){msg.textContent='読み取れませんでした。【Good】【Development】の見出しが入った返事を、そのまま全部貼ってください。';msg.style.color='var(--bad)';return}e.src='Gemini';saveFb(e);renderPlayer()}});
+ return h('div',{class:'fb'},h('b',{text:'提出'}),
+  h('ol',{class:'small',style:'padding-left:20px;margin:6px 0'},
+   h('li',{text:'イヤホンをつけて「● 録音しながら再生」。英文を隠したまま追いかける。'+(IT.cat==='lr'?'（文ごとに止まる間に言う）':'')+'再生が終わると録音も止まる。'}),
+   h('li',{text:'下で自分の録音を聞き直す。'}),
+   h('li',{text:'「Gemini で添削」を押す。結果は下の「添削」に入り、今日の提出も済みになる。'})),
+  myRecBox(false),
+  h('div',{class:'row'},gbtn),msg,
+  st.gkey?null:h('p',{class:'small muted',text:'自動添削には Gemini の API キーが必要です（右上の設定）。キーがなければ、下の「Gemini アプリで添削」を使う。'}),
+  h('details',{class:'manual'},h('summary',{class:'small',text:'Gemini アプリで添削（API キーなし）'}),
+   h('ol',{class:'small',style:'padding-left:20px;margin:6px 0'},h('li',{text:'「指示をコピー」→ Gemini アプリに貼る。'}),h('li',{text:'「録音を共有」→ Gemini アプリを選ぶ（出てこなければ「ファイルに保存」して Gemini で添付）。'}),h('li',{text:'送って返ってきた返事を全部コピーし、下に貼って「添削を保存」。'})),
+   h('div',{class:'row'},cbtn,sbtn),holder,h('div',{style:'margin-top:8px'},ta),h('div',{class:'row'},save)),
+  h('div',{class:'row',style:'margin-top:6px'},h('button',{class:'linkbtn small',type:'button',text:rec.sub?'今日は提出済み（押すと取り消し）':'添削なしで提出済みにする',onclick:()=>{bump(IT.id,'sub',rec.sub?0:1);renderPlayer()}})));
+}
+function fbBox(top){const fb=fbFor(IT.id);const box=h('div',{class:top?'fb fbtop':'fb'},h('b',{text:'添削'}));
+ if(!fb.length){box.append(h('p',{class:'small muted',text:'まだありません。「提出」で Gemini の返事を貼ると、ここに入ります。'}))}
+ else fb.slice().reverse().forEach((f,idx)=>{const orig=fb.length-1-idx;
+  const card=h('details',{class:'fbrow'},h('summary',null,h('b',{class:'num',text:(f.day?'Day '+f.day+'・':'')+f.date+(f.src?'・'+f.src:'')}),
+   h('span',{class:'k num'},f.acc!=null?h('span',null,'言えた語 ',h('b',{text:f.acc+'%'})):null,f.wpm?h('span',null,'速さ ',h('b',{text:f.wpm+(f.model_wpm?' / '+f.model_wpm:'')+' WPM'})):null,f.pauses!=null?h('span',null,'0.5秒以上の間 ',h('b',{text:f.pauses+'回'})):null)));
+  if(idx===0)card.open=true;
+  if(f.comment)card.append(h('p',{style:'margin:6px 0',text:f.comment}));
+  if(f.good&&f.good.length)card.append(h('div',{class:'gd'},h('div',{class:'tag good',text:'Good'}),f.good.map(g=>h('div',{class:'pt'},g.p?h('div',{class:'en ph',text:g.p}):null,h('div',{text:g.t})))));
+  if(f.dev&&f.dev.length)card.append(h('div',{class:'dv'},h('div',{class:'tag dev',text:'Development'}),f.dev.map(g=>h('div',{class:'pt'},g.p?h('div',{class:'en ph',text:g.p}):null,h('div',{text:g.t})))));
+  if(f.heard)card.append(h('details',{class:'heard'},h('summary',{class:'small muted',text:'聞き取った英文'}),h('p',{class:'en small',text:f.heard})));
+  const del=h('button',{class:'linkbtn small',type:'button',text:'この添削を消す'});
+  del.onclick=()=>{if(del.dataset.arm){const all=Object.assign({},LS.get('fb',{}));const arr=(all[IT.id]||[]).slice();arr.splice(orig,1);all[IT.id]=arr;LS.set('fb',all);renderPlayer()}else{del.dataset.arm='1';del.textContent='もう一度押すと消えます'}};
+  card.append(h('div',{style:'text-align:right;margin-top:4px'},del));
+  box.append(card)});
+ if(top){box.append(myRecBox(true))}
+ if(top){const rec=todayRec(IT.id);box.append(h('button',{class:'btn'+(rec.fb?'':' primary'),type:'button',style:'margin-top:8px',text:rec.fb?'確認済み':'確認した',onclick:()=>{bump(IT.id,'fb',1);step=Math.min(step+1,planFor(DAY).length-1);applyStepView();renderPlayer()}}))}
+ return box}
+function scrollCur(){const el=$('ln'+cur);if(el){const sc=$('script');const r=el.getBoundingClientRect(),s=sc.getBoundingClientRect();if(r.top<s.top+10||r.bottom>s.bottom-10)sc.scrollTop+=r.top-s.top-sc.clientHeight*0.3}}
+function lineAt(t){for(let i=IT.lines.length-1;i>=0;i--)if(t>=IT.lines[i].s-0.05)return i;return 0}
+function setCur(i){if(i===cur)return;const o=$('ln'+cur);if(o)o.classList.remove('cur','loop');cur=i;const n=$('ln'+i);if(n){n.classList.add('cur');if(loop)n.classList.add('loop')}scrollCur();if(S().view==='hide')renderPlayer()}
+function clearWait(){if(waiting){clearTimeout(waiting);waiting=null}}
+function jump(i){clearWait();au.currentTime=IT.lines[i].s;setCur(i);if(au.paused)play()}
+function play(){au.playbackRate=S().rate;const pr=au.play();if(pr&&pr.catch)pr.catch(()=>{});}
+function toggle(){if(waiting){clearWait();updPB();return}if(au.paused){if(au.currentTime>=IT.dur-0.2)au.currentTime=0;play()}else au.pause()}
+function updPB(){const b=$('pb');if(b){b.innerHTML=(au.paused&&!waiting)?ICON.play:ICON.pause;b.setAttribute('aria-label',(au.paused&&!waiting)?'再生':'一時停止')}}
+function abTap(){if(A==null){A=au.currentTime}else if(B==null){B=au.currentTime;if(B<=A+0.3){A=B=null}else{au.currentTime=A;play()}}else{A=B=null}renderPlayer()}
+function gapMs(i){const st=S();const l=IT.lines[i];if(st.pause==='len')return ((l.e-l.s)/st.rate+1)*1000;return (+st.pause)*1000}
+function tick(){
+ if(!IT){raf=0;return}
+ const t=au.currentTime;
+ if(!au.paused){const now=performance.now();if(lastT)heard+=Math.min(0.5,(now-lastT)/1000);lastT=now;if(heard>=15)flushHeard()}else lastT=0;
+ if(A!=null&&B!=null&&t>=B){au.currentTime=A}
+ const i=lineAt(t);const l=IT.lines[i];
+ if(!au.paused&&!waiting){
+  const pm=S().pause;
+  if(t>=l.e-0.02&&(loop||pm!=='off')&&(A==null||B==null)){
+   const nextI=loop?i:i+1;
+   au.pause();const ms=pm==='off'?600:gapMs(i);
+   waiting=setTimeout(()=>{waiting=null;if(nextI<IT.lines.length){au.currentTime=IT.lines[nextI].s;setCur(nextI);play()}else{finishPass();updPB()}},ms);updPB();
+  }
+ }
+ if(!waiting)setCur(i);
+ const s=$('seek');if(s&&document.activeElement!==s)s.value=t;const tn=$('tnow');if(tn)tn.textContent=fmt(t);const tl=$('tleft');if(tl)tl.textContent='-'+fmt(IT.dur-t);
+ if(REC){const m=$('recmsg');if(m)m.textContent='録音中 '+fmt((Date.now()-recT0)/1000)}
+ raf=requestAnimationFrame(tick)}
+function flushHeard(){if(heard>=1&&IT)logSec(heard,IT.id);heard=0}
+function finishPass(){if(!IT)return;const k=stepKey();if(REC)setTimeout(stopRec,1500);
+ if(k==='c'||k==='o'||k==='s')bump(IT.id,k);
+ flushHeard();clearWait();au.pause();au.currentTime=0;cur=-1;
+ const plan=planFor(DAY),rec=todayRec(IT.id);if((rec[k]||0)>=plan[step][2]&&step<plan.length-1&&k!=='s'){step++;applyStepView()}
+ renderPlayer()}
+au.addEventListener('play',()=>{updPB();if(!raf)raf=requestAnimationFrame(tick)});
+au.addEventListener('pause',updPB);
+au.addEventListener('ended',()=>{if(waiting)return;if(A!=null&&B!=null){au.currentTime=A;play();return}finishPass();updPB()});
+// ---------- recording (kept in this browser) ----------
+const IDB={db:null,open(){return this.db||(this.db=new Promise((res,rej)=>{const r=indexedDB.open('shd-rec',1);r.onupgradeneeded=()=>r.result.createObjectStore('rec');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))},
+ async put(k,v){const d=await this.open();return new Promise((res,rej)=>{const t=d.transaction('rec','readwrite');t.objectStore('rec').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})},
+ async get(k){const d=await this.open();return new Promise((res,rej)=>{const q=d.transaction('rec').objectStore('rec').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}};
+const recKey=id=>id+'|'+today();
+let REC=null,RECMSG='',recT0=0;
+function recMsg(t){RECMSG=t;const m=$('recmsg');if(m)m.textContent=t}
+async function startRec(){
+ if(REC)return;
+ try{const p=au.play();if(p&&p.then)p.then(()=>au.pause()).catch(()=>{})}catch(e){}
+ if(!navigator.mediaDevices||!window.MediaRecorder){recMsg('このブラウザは録音に対応していません。iPhone なら Safari で開いてください。');return}
+ let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
+ const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+ const mr=new MediaRecorder(stream,type?{mimeType:type}:undefined);const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+ REC={stream,mr,id:IT.id};recT0=Date.now();
+ mr.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mr.mimeType||type||'audio/mp4'});const id=REC&&REC.id;REC=null;
+  if(blob.size<1500){recMsg('録音できませんでした。もう一度試してください。');if(IT)renderPlayer();return}
+  try{await IDB.put(recKey(id),{blob,type:blob.type,at:Date.now()});recMsg('録音を保存しました（'+fmt((Date.now()-recT0)/1000)+'）。「提出」で聞き直し・添削できます。')}catch(e){recMsg('録音を保存できませんでした（'+e.message+'）。')}
+  if(IT)renderPlayer()};
+ mr.start(1000);recMsg('録音中：イヤホンで聞きながら追いかける');
+ clearWait();au.currentTime=0;cur=-1;play();renderPlayer();
+}
+function stopRec(){if(REC&&REC.mr.state!=='inactive')REC.mr.stop()}
+function recRow(){
+ const b=h('button',{class:'recbtn'+(REC?' on':''),type:'button',text:REC?'■ 録音を止める':'● 録音しながら再生',onclick:()=>{REC?stopRec():startRec()}});
+ return h('div',{class:'recrow'},b,h('span',{class:'small muted num',id:'recmsg',text:REC?'録音中 '+fmt((Date.now()-recT0)/1000):RECMSG}))}
+function myRecBox(prev){
+ const box=h('div',{class:'myrec'},h('div',{class:'small muted',text:prev?'前回の自分の録音':'今日の自分の録音'}));
+ const find=async()=>{if(!prev)return IDB.get(recKey(IT.id));for(let i=1;i<15;i++){const d=new Date();d.setDate(d.getDate()-i);const r=await IDB.get(IT.id+'|'+ymd(d));if(r)return r}return null};
+ find().then(r=>{if(!r){box.append(h('p',{class:'small muted',text:prev?'この端末に前回の録音はありません。':'まだありません。下の「● 録音しながら再生」で録音できます。'}));return}
+  const a=h('audio',{controls:true,preload:'metadata',src:URL.createObjectURL(r.blob)});box.append(a)}).catch(()=>{});
+ return box}
+// ---------- Gemini ----------
+const DEFM='gemini-flash-latest';
+function blobB64(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(String(f.result).split(',')[1]);f.onerror=()=>rej(f.error);f.readAsDataURL(b)})}
+async function toWav16k(blob){
+ const ab=await blob.arrayBuffer();const AC=window.AudioContext||window.webkitAudioContext;const ac=new AC();
+ const buf=await new Promise((res,rej)=>{const p=ac.decodeAudioData(ab,res,rej);if(p&&p.then)p.then(res,rej)});try{ac.close()}catch(e){}
+ const sr=16000,len=Math.max(1,Math.ceil(buf.duration*sr));const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;const off=new OC(1,len,sr);
+ const src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start(0);
+ const out=await new Promise((res,rej)=>{off.oncomplete=e=>res(e.renderedBuffer);const p=off.startRendering();if(p&&p.then)p.then(res,rej)});
+ const d=out.getChannelData(0),v=new DataView(new ArrayBuffer(44+d.length*2));const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+ w(0,'RIFF');v.setUint32(4,36+d.length*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,d.length*2,true);
+ for(let i=0;i<d.length;i++){const s=Math.max(-1,Math.min(1,d[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}
+ return new Blob([v],{type:'audio/wav'})}
+function apiErr(status,j){const m=(j&&j.error&&j.error.message)||'';
+ if(status===429)return '無料枠の上限に達しました。しばらく待つか、明日もう一度（毎日 日本時間の16〜17時ごろにリセット）。';
+ if(status===400&&/API key/i.test(m))return 'API キーが正しくありません。設定で入れ直してください。';
+ if(status===403)return 'この API キーでは使えません（'+m+'）。';
+ if(status===404)return 'モデル名が見つかりません。設定の「使えるモデルを確認」で選び直してください。';
+ return 'エラー '+status+'：'+m}
+function saveFb(e){const all=Object.assign({},LS.get('fb',{}));all[IT.id]=(all[IT.id]||[]).concat([e]);LS.set('fb',all);if(!todayRec(IT.id).sub)bump(IT.id,'sub',1)}
+async function geminiGrade(btn,msg){
+ const st=S();if(!st.gkey){msg.textContent='先に右上の設定で Gemini の API キーを入れてください。';return}
+ const r=await IDB.get(recKey(IT.id)).catch(()=>null);if(!r){msg.textContent='今日の録音がありません。先に「● 録音しながら再生」で録音してください。';return}
+ btn.disabled=true;msg.textContent='Gemini に送っています…（20〜60秒）';
+ try{
+  let data,mime;try{const wav=await toWav16k(r.blob);data=await blobB64(wav);mime='audio/wav'}catch(e){data=await blobB64(r.blob);mime=(r.type||'audio/mp4').split(';')[0]}
+  const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent((st.gmodel||DEFM).replace(/^models\//,''))+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.gkey},
+   body:JSON.stringify({contents:[{role:'user',parts:[{text:geminiPrompt()},{inline_data:{mime_type:mime,data}}]}],generationConfig:{temperature:0.2}})});
+  const j=await res.json().catch(()=>({}));
+  if(!res.ok){msg.textContent=apiErr(res.status,j);btn.disabled=false;return}
+  const txt=(((j.candidates||[])[0]||{}).content||{parts:[]}).parts.map(p=>p.text||'').join('\n');
+  const e=parseGemini(txt);
+  if(!e){msg.textContent='返事を読み取れませんでした。返事を下の欄に入れたので、確認して「添削を保存」を押してください。';const ta=$('gemPaste');if(ta)ta.value=txt;btn.disabled=false;return}
+  e.src='Gemini';saveFb(e);renderPlayer();
+ }catch(err){msg.textContent='送れませんでした（'+err.message+'）。通信と API キーを確認してください。';btn.disabled=false}}
+async function shareRec(msg){
+ const r=await IDB.get(recKey(IT.id)).catch(()=>null);if(!r){msg.textContent='今日の録音がありません。';return}
+ const ext=/mp4|aac|m4a/.test(r.type)?'m4a':/webm/.test(r.type)?'webm':/ogg/.test(r.type)?'ogg':'wav';
+ const f=new File([r.blob],IT.id+'_'+today()+'.'+ext,{type:r.type||'audio/mp4'});
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
+ const a=h('a',{href:URL.createObjectURL(f),download:f.name});document.body.append(a);a.click();a.remove();msg.textContent='録音ファイルを保存しました。Gemini アプリで添付してください。'}
+async function listModels(out){const st=S();if(!st.gkey){out.textContent='API キーを入れてください。';return}
+ out.textContent='確認中…';
+ try{const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':st.gkey}});const j=await res.json().catch(()=>({}));
+  if(!res.ok){out.textContent=apiErr(res.status,j);return}
+  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/gemini/i.test(m.name)&&!/tts|image|embedding|live|native-audio/i.test(m.name)).map(m=>m.name.replace(/^models\//,''));
+  out.innerHTML='';if(!ms.length){out.textContent='使えるモデルが見つかりませんでした。';return}
+  const sel=h('select',{id:'gmodelSel','aria-label':'モデル'},ms.map(m=>h('option',{value:m,text:m})));sel.value=ms.includes(st.gmodel)?st.gmodel:(ms.find(m=>/flash-latest/.test(m))||ms.find(m=>/flash/.test(m)&&!/lite/.test(m))||ms[0]);setS({gmodel:sel.value});
+  sel.onchange=()=>setS({gmodel:sel.value});out.append(h('div',{class:'small',text:'つながりました。使うモデル：'}),sel)}
+ catch(err){out.textContent='つながりませんでした（'+err.message+'）。'}}
+function backupOut(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(PFX)&&k!==PFX+'set')o[k]=localStorage.getItem(k)}}catch(e){}
+ const f=new Blob([JSON.stringify(o)],{type:'application/json'});const a=h('a',{href:URL.createObjectURL(f),download:'shadowing-backup-'+today()+'.json'});document.body.append(a);a.click();a.remove()}
+function backupIn(file,out){const fr=new FileReader();fr.onload=()=>{try{const o=JSON.parse(fr.result);let n=0;Object.keys(o).forEach(k=>{if(k.startsWith(PFX)){localStorage.setItem(k,o[k]);delete MEM[k.slice(PFX.length)];n++}});out.textContent=n+'件を読み込みました。';rerender()}catch(e){out.textContent='読み込めませんでした。'}};fr.readAsText(file)}
+// ---------- settings sheet ----------
+function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
+ if(!IT){sh.append(...gemSettings(),h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));sh.hidden=false;$('shade').hidden=false;return}
+ const rate=h('input',{type:'range',id:'rate',min:0.6,max:1.4,step:0.05,value:st.rate,'aria-label':'速さ'});
+ const rv=h('b',{class:'num',text:'×'+st.rate.toFixed(2)+'（'+Math.round(IT.words/IT.dur*60*st.rate)+' WPM）'});
+ rate.oninput=()=>{const r=+rate.value;au.playbackRate=r;setS({rate:r});rv.textContent='×'+r.toFixed(2)+'（'+Math.round(IT.words/IT.dur*60*r)+' WPM）'};
+ const seg=(key,opts)=>{const s=h('div',{class:'seg'});opts.forEach(([v,n])=>s.append(h('button',{type:'button','aria-pressed':String(String(S()[key])===String(v)),text:n,onclick:()=>{setS({[key]:v});openSheet();renderPlayer()}})));return s};
+ const fs=h('input',{type:'range',id:'fs',min:15,max:28,step:1,value:st.fs,'aria-label':'文字の大きさ',oninput:e=>{setS({fs:+e.target.value});$('player').style.setProperty('--fs',e.target.value+'px')}});
+ sh.append(h('h3',{text:'再生'}),
+  h('div',{class:'row'},h('span',{text:'速さ'}),rate,rv),
+  h('div',{class:'row'},h('span',{text:'文ごとに止める'}),seg('pause',[['off','止めない'],['len','文の長さ＋1秒'],['1','1秒'],['3','3秒'],['5','5秒']])),
+  h('p',{class:'small muted',text:'「文の長さ＋1秒」は Listen & Repeat の本番と同じ考え方。聞いた文と同じ長さの間に言い切る。'}),
+  h('h3',{text:'表示',style:'margin-top:12px'}),
+  h('div',{class:'row'},h('span',{text:'文字の大きさ'}),fs),
+  ...gemSettings(),
+  h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));
+ sh.hidden=false;$('shade').hidden=false}
+function closeSheet(){$('sheet').hidden=true;$('shade').hidden=true;if(IT)renderPlayer();else renderHome()}
+function gemSettings(){const st=S();const out=h('div',{class:'small',id:'gmOut',text:st.gkey?'使うモデル：'+(st.gmodel||DEFM):''});
+ const key=h('input',{type:'password',id:'gkey',autocomplete:'off',placeholder:'AIza…',value:st.gkey||'','aria-label':'Gemini API キー',style:'flex:1;min-width:160px'});key.oninput=()=>setS({gkey:key.value.trim()});
+ const bo=h('div',{class:'small',id:'bkOut'});const fi=h('input',{type:'file',accept:'application/json',id:'bkIn',style:'max-width:220px'});fi.onchange=()=>{if(fi.files[0])backupIn(fi.files[0],bo)};
+ return [h('h3',{text:'Gemini 添削',style:'margin-top:12px'}),
+  h('p',{class:'small muted',text:'Google AI Studio（aistudio.google.com）で作った API キーを入れる。キーはこの端末の中だけに保存されます。'}),
+  h('div',{class:'row'},h('span',{text:'API キー'}),key),
+  h('div',{class:'row'},h('button',{class:'btn',type:'button',text:'使えるモデルを確認',onclick:()=>listModels(out)}),out),
+  h('h3',{text:'記録のバックアップ',style:'margin-top:12px'}),
+  h('p',{class:'small muted',text:'記録はこの端末のブラウザに保存されます。機種変更や履歴の削除の前に書き出してください（録音は含みません）。'}),
+  h('div',{class:'row'},h('button',{class:'btn',type:'button',text:'書き出す',onclick:backupOut}),fi),bo]}
+$('shade').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(!IT||e.target.tagName==='INPUT')return;if(e.code==='Space'){e.preventDefault();toggle()}else if(e.key==='ArrowLeft')jump(Math.max(0,cur-1));else if(e.key==='ArrowRight')jump(Math.min(IT.lines.length-1,cur+1))});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)flushHeard()});
+function rerender(){if(IT){DAY=dayNo(IT.id);renderPlayer()}else renderHome()}
+// ---------- lock (contents are encrypted on the server) ----------
+const CRY={key:null,meta:null};
+const hexd=h2=>new Uint8Array(h2.match(/../g).map(x=>parseInt(x,16)));
+function b64e(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
+function b64d(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+async function deriveKey(pw,meta){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw.normalize('NFC')),'PBKDF2',false,['deriveKey']);
+ return crypto.subtle.deriveKey({name:'PBKDF2',salt:hexd(meta.salt),iterations:meta.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},true,['decrypt'])}
+async function dec(buf){const u=new Uint8Array(buf);return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},CRY.key,u.slice(12))}
+async function loadData(){const r=await fetch('data.enc',{cache:'no-cache'});if(!r.ok)throw new Error('data '+r.status);ITEMS=JSON.parse(new TextDecoder().decode(await dec(await r.arrayBuffer())))}
+const AUD={};
+async function audioUrl(id){if(AUD[id])return AUD[id];const r=await fetch('audio/'+id+'.enc');if(!r.ok)throw new Error('audio '+r.status);const pt=await dec(await r.arrayBuffer());return AUD[id]=URL.createObjectURL(new Blob([pt],{type:'audio/mpeg'}))}
+function lockScreen(msg){const root=$('home');root.innerHTML='';
+ const inp=h('input',{type:'password',id:'pass',autocomplete:'current-password','aria-label':'合言葉',placeholder:'合言葉',class:'passin'});const m=h('p',{class:'small',id:'lockmsg',text:msg});
+ const go=h('button',{class:'btn primary',type:'button',text:'開く'});
+ const run=async()=>{if(!inp.value)return;go.disabled=true;m.textContent='確認中…（数秒かかります）';
+  try{CRY.key=await deriveKey(inp.value,CRY.meta);await loadData();const raw=new Uint8Array(await crypto.subtle.exportKey('raw',CRY.key));try{localStorage.setItem(PFX+'k',b64e(raw))}catch(e){}renderHome()}
+  catch(e){m.textContent=/data \d/.test(e.message)?'読み込めませんでした（'+e.message+'）。':'合言葉が違います。';go.disabled=false}};
+ go.onclick=run;inp.onkeydown=e=>{if(e.key==='Enter')run()};
+ root.append(h('h1',{text:'TOEFL シャドーイング'}),h('p',{class:'small muted',text:'合言葉を入れてください。この端末では次回から入力不要です。'}),h('div',{class:'row'},inp,go),m)}
+async function boot(){
+ try{const r=await fetch('meta.json',{cache:'no-cache'});CRY.meta=await r.json()}catch(e){lockScreen('読み込めませんでした。通信を確認してください。');return}
+ let saved=null;try{saved=localStorage.getItem(PFX+'k')}catch(e){}
+ if(saved){try{CRY.key=await crypto.subtle.importKey('raw',b64d(saved),{name:'AES-GCM'},false,['decrypt']);await loadData();renderHome();return}catch(e){}}
+ lockScreen('')}
+boot();
+</script>
+</body></html>
