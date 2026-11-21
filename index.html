@@ -143,7 +143,27 @@ details.manual{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
 .hometop{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sheet input[type=password]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--ink)}
 .sheet select{max-width:100%}
-.passin{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:16px;background:var(--surface);color:var(--ink);flex:1;min-width:0}
+.player.playing .chrome,.player.playing .fb{display:none}
+.chrome{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.chrome .steps{margin:6px 0 0}
+.steps button{padding:4px 2px;font-size:11.5px;line-height:1.25}
+.steps button .n{font-size:12px}
+.views{margin:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.views::-webkit-scrollbar{display:none}
+.views button{padding:3px 9px;font-size:12px;white-space:nowrap;flex:none}
+.top{padding-top:6px}
+.iconbtn{width:36px;height:36px}
+.bar{padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.ctrls{margin-top:2px}
+.ctrls .iconbtn{width:42px;height:42px}
+.play{width:54px;height:54px}
+.mic{border-color:var(--bad);color:var(--bad);width:auto!important;padding:0 8px;border-radius:21px}
+.mic.on{background:var(--bad);color:#fff}
+.recrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;min-height:24px}
+.minibtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 12px;font-size:12px;flex:none}
+.counter{margin-top:2px}
+.recrow.rec-on{background:var(--bad);color:#fff;border-radius:12px;padding:6px 6px 6px 12px;font-weight:700}
+.stopbtn{background:#fff;color:var(--bad);border:0;border-radius:999px;padding:6px 14px;font-weight:700;flex:none}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style>
 </head><body><div id="home" class="wrap"></div>
@@ -153,17 +173,17 @@ details.manual{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
 <audio id="au" preload="auto"></audio>
 <script>
 let ITEMS=[];
-const CATS=[['lr','Listen & Repeat','本番と同じ形。1文聞いて、間に同じ文を言う。'],['intv','Interview お手本','型をそのまま口に入れる。Q1は事実型、Q2〜Q4は意見型。'],['talk','講義','Academic Talk。Listening で一番配点が大きい形式。'],['conv','会話','Conversation。2人の声の切り替わりに付いていく。'],['ann','アナウンス','Announcement。日時・場所・変更点を聞き取る。']];
+const CATS=[['talk','講義','Academic Talk。長い講義を40〜50秒のパートに分けてある。'],['conv','会話','Conversation。2人の声の切り替わりに付いていく。'],['ann','アナウンス','Announcement。日時・場所・変更点を聞き取る。'],['intv','Interview お手本','Speaking の型をそのまま口に入れる。'],['lr','Listen & Repeat','本番の Listen & Repeat 形式（1文ずつ・30秒前後）。長く練習したいときは講義・会話へ。']];
 // day plans: [key, label, target, guide]
 const PLAN1=[
  ['c','内容確認',1,'<b>内容確認：英文を見ずに</b>1回聞く。わからなかった所は「英＋和」で確認。'],
  ['o','重ね読み',3,'<b>オーバーラッピング：英文を見ながら</b>音声と同時に読む。速さとリズムをつかむ。'],
  ['s','シャドー',5,'<b>シャドーイング：英文を隠して</b>2〜3語遅れで追いかける。イヤホン必須。'],
- ['sub','提出',1,'<b>提出：</b>「● 録音しながら再生」で録音し、「Gemini で添削」を押す。']];
+ ['sub','提出',1,'<b>提出：</b>「● 録音」で録音し、「Gemini で添削」を押す。']];
 const PLAN2=[
  ['fb','添削確認',1,'<b>添削確認：</b>前回の Development を読み、その部分を英文で確かめてから練習する。（3分）'],
  ['s','シャドー',20,'<b>シャドーイング：英文を隠して</b>同じ音声を20〜25回。直す所を1つ決めて追いかける。'],
- ['sub','提出',1,'<b>提出：</b>「● 録音しながら再生」で録音し、「Gemini で添削」を押す。']];
+ ['sub','提出',1,'<b>提出：</b>「● 録音」で録音し、「Gemini で添削」を押す。']];
 const MKN={F:['ラ','T・Dがラ行っぽくなる'],D:['消','音が消える・弱まる'],L:['つ','つながる']};
 const $=id=>document.getElementById(id);
 function h(tag,p,...kids){const e=document.createElement(tag);if(p)for(const k in p){const v=p[k];if(v==null||v===false)continue;if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?'':v)}kids.flat().forEach(c=>{if(c==null||c===false)return;e.appendChild(typeof c==='string'?document.createTextNode(c):c)});return e}
@@ -190,7 +210,7 @@ async function flush(k){if(!(k in pend))return;const v=pend[k];delete pend[k];tr
  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PFX)&&k!==PFX+'cat'){const id=k.slice(PFX.length);if(!snap.docs.some(d=>d.id===id)){pend[id]=JSON.parse(localStorage.getItem(k));flush(id)}}}}catch(e){}
  rerender();}catch(e){}})();
 // ---------- settings & 4-day progress ----------
-const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true};
+const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true,wa:true,boost:2};
 function S(){return Object.assign({},DEF,LS.get('set',{}))}
 function setS(p){LS.set('set',Object.assign(S(),p))}
 function prog(id){const p=(LS.get('prog',{}))[id]||{};return {days:Object.assign({},p.days||{})}}
@@ -204,7 +224,7 @@ function subDays(id){const p=prog(id);return dayKeys(id).filter(k=>(p.days[k].su
 function logSec(sec,id){const k='log-'+today();const L=Object.assign({sec:0,items:{}},LS.get(k,{}));L.sec=Math.round(L.sec+sec);L.items[id]=Math.round((L.items[id]||0)+sec);LS.set(k,L)}
 function fbFor(id){const f=LS.get('fb',{});return (f&&f[id])||[]}
 // ---------- home ----------
-let curCat=(()=>{try{return localStorage.getItem(PFX+'cat')||'lr'}catch(e){return 'lr'}})();
+let curCat=(()=>{try{return localStorage.getItem(PFX+'cat')||'talk'}catch(e){return 'talk'}})();let showGuide=false;
 function renderHome(){
  const root=$('home');root.innerHTML='';
  const t=LS.get('log-'+today(),{sec:0});let streak=0;for(let i=0;i<60;i++){const d=new Date();d.setDate(d.getDate()-i);const v=LS.get('log-'+ymd(d),null);if(v&&v.sec>=60)streak++;else if(i>0)break}
@@ -243,18 +263,19 @@ function renderPlayer(){
  root.style.setProperty('--fs',st.fs+'px');
  root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'一覧に戻る',html:ICON.back,onclick:closeItem}),
   h('div',{class:'ttl'},h('div',{text:IT.title}),h('div',{class:'small muted num',text:(DAY>4?'復習（4日完了済み）':'Day '+DAY+' / 4')})),
+  h('button',{class:'iconbtn'+(showGuide?' tog':''),type:'button','aria-pressed':String(showGuide),'aria-label':'説明を表示',text:'?',onclick:()=>{showGuide=!showGuide;renderPlayer()}}),
   h('button',{class:'iconbtn',type:'button','aria-label':'再生設定',html:ICON.gear,onclick:openSheet})));
  const steps=h('div',{class:'steps',style:'grid-template-columns:repeat('+plan.length+',1fr)'});
  plan.forEach(([kk,n,t],i)=>{const got=rec[kk]||0;steps.append(h('button',{type:'button','aria-pressed':String(i===step),class:got>=t?'done':'',onclick:()=>{step=i;applyStepView();renderPlayer()}},h('span',{class:'n',text:String(i+1)}),n,h('span',{class:'cnt num',text:t>1?got+'/'+t:(got?'済':'')})))});
- root.append(steps,h('div',{class:'guide',html:plan[step][3]}));
+ const chrome=h('div',{class:'chrome'},steps,showGuide?h('div',{class:'guide',html:plan[step][3]}):null);root.append(chrome);
  const views=h('div',{class:'views'});[['en','英文'],['both','英＋和'],['ja','和訳'],['gap','穴あき'],['hide','隠す']].forEach(([kk,n])=>views.append(h('button',{type:'button','aria-pressed':String(st.view===kk),text:n,onclick:()=>{setS({view:kk});renderPlayer()}})));
  views.append(h('button',{type:'button',class:'mkbtn','aria-pressed':String(st.mk),text:'音の変化',onclick:()=>{setS({mk:!S().mk});renderPlayer()}}));
- root.append(views);
+ chrome.append(views);
  const sc=h('div',{class:'script',id:'script'});
  if(k==='fb')sc.append(fbBox(true));
  if(IT.q)sc.append(h('div',{class:'q',text:'Q. '+IT.q}));
  const showMk=st.mk&&(st.view==='en'||st.view==='both');
- if(showMk)sc.append(h('div',{class:'legend'},Object.entries(MKN).map(([t,[a,b]])=>h('span',null,h('i',{class:'bd b'+t,text:a}),b))));
+ if(showMk&&showGuide)sc.append(h('div',{class:'legend'},Object.entries(MKN).map(([t,[a,b]])=>h('span',null,h('i',{class:'bd b'+t,text:a}),b))));
  if(st.view==='hide'){sc.append(h('div',{class:'hiddenbox',html:'英文を隠しています<br><span class="small">'+(cur>=0?'いま '+(cur+1)+' / '+IT.lines.length+' 文目':'再生ボタンで開始')+'</span>'}))}
  else{const vs=IT.cat==='conv'?[...new Set(IT.lines.map(l=>l.v))]:[];
   IT.lines.forEach((l,i)=>{const b=h('button',{type:'button',class:'ln'+(i===cur?' cur':'')+(loop&&i===cur?' loop':''),id:'ln'+i,onclick:()=>jump(i)});
@@ -275,10 +296,10 @@ function renderPlayer(){
   h('button',{class:'iconbtn',type:'button','aria-label':'前の文',html:ICON.prev,onclick:()=>jump(Math.max(0,(cur<0?0:cur)-((au.currentTime-(IT.lines[cur]||{s:0}).s)>1?0:1)))}),
   pb,
   h('button',{class:'iconbtn',type:'button','aria-label':'次の文',html:ICON.next,onclick:()=>jump(Math.min(IT.lines.length-1,cur+1))}),
-  h('button',{class:'iconbtn tog',type:'button','aria-pressed':String(A!=null),'aria-label':'A-Bリピート',onclick:abTap},h('span',{class:'lbl',text:A==null?'A-B':(B==null?'B?':'A-B')}))));
+  h('button',{class:'iconbtn tog',type:'button','aria-pressed':String(A!=null),'aria-label':'A-Bリピート',onclick:abTap},h('span',{class:'lbl',text:A==null?'A-B':(B==null?'B?':'A-B')})),
+  h('button',{class:'iconbtn mic'+(REC?' on':''),type:'button','aria-label':REC?'録音を止める':'録音しながら再生',onclick:()=>{REC?stopRec():startRec()}},h('span',{class:'lbl',text:REC?'■':'● 録音'}))));
  bar.append(recRow());
- const pauseTxt={off:'文ごとに止めない',len:'文ごとに止める：文の長さ＋1秒',1:'文ごとに止める：1秒',3:'文ごとに止める：3秒',5:'文ごとに止める：5秒'}[st.pause];
- bar.append(h('div',{class:'counter num',id:'counter',text:'×'+st.rate.toFixed(2)+'（'+Math.round(IT.words/IT.dur*60*st.rate)+' WPM）・'+pauseTxt+(A!=null?'・A '+fmt(A)+(B!=null?' 〜 B '+fmt(B):''):'')}));
+ if(A!=null)bar.append(h('div',{class:'counter num',text:'A '+fmt(A)+(B!=null?' 〜 B '+fmt(B):'')}));
  root.append(bar);
  scrollCur();
 }
@@ -339,7 +360,7 @@ function submitBox(){
  const save=h('button',{class:'btn',type:'button',text:'添削を保存',onclick:()=>{const e=parseGemini(ta.value);if(!e){msg.textContent='読み取れませんでした。【Good】【Development】の見出しが入った返事を、そのまま全部貼ってください。';msg.style.color='var(--bad)';return}e.src='Gemini';saveFb(e);renderPlayer()}});
  return h('div',{class:'fb'},h('b',{text:'提出'}),
   h('ol',{class:'small',style:'padding-left:20px;margin:6px 0'},
-   h('li',{text:'イヤホンをつけて「● 録音しながら再生」。英文を隠したまま追いかける。'+(IT.cat==='lr'?'（文ごとに止まる間に言う）':'')+'再生が終わると録音も止まる。'}),
+   h('li',{text:'イヤホンをつけて下の「● 録音」。お手本が最初から流れるので、英文を隠したまま追いかける。'+(IT.cat==='lr'?'（文ごとに止まる間に言う）':'')+'再生が終わると録音も止まる。'}),
    h('li',{text:'下で自分の録音を聞き直す。'}),
    h('li',{text:'「Gemini で添削」を押す。結果は下の「添削」に入り、今日の提出も済みになる。'})),
   myRecBox(false),
@@ -372,9 +393,22 @@ function lineAt(t){for(let i=IT.lines.length-1;i>=0;i--)if(t>=IT.lines[i].s-0.05
 function setCur(i){if(i===cur)return;const o=$('ln'+cur);if(o)o.classList.remove('cur','loop');cur=i;const n=$('ln'+i);if(n){n.classList.add('cur');if(loop)n.classList.add('loop')}scrollCur();if(S().view==='hide')renderPlayer()}
 function clearWait(){if(waiting){clearTimeout(waiting);waiting=null}}
 function jump(i){clearWait();au.currentTime=IT.lines[i].s;setCur(i);if(au.paused)play()}
-function play(){au.playbackRate=S().rate;const pr=au.play();if(pr&&pr.catch)pr.catch(()=>{});}
+// ---------- audio path: keeps the output awake so the start is not cut, and lets us raise the volume while recording ----------
+let AC=null,GAIN=null;
+function ensureAC(){
+ if(S().wa===false)return;
+ try{
+  if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();const src=AC.createMediaElementSource(au);GAIN=AC.createGain();const comp=AC.createDynamicsCompressor();comp.threshold.value=-6;comp.knee.value=6;comp.ratio.value=8;
+   src.connect(GAIN);GAIN.connect(comp);comp.connect(AC.destination);
+   const keep=AC.createOscillator();const kg=AC.createGain();kg.gain.value=0.00001;keep.frequency.value=30;keep.connect(kg);kg.connect(AC.destination);keep.start();
+   AC.onstatechange=()=>{if(AC.state!=='running'&&(!au.paused||REC))AC.resume().catch(()=>{})}}
+  if(AC.state!=='running')AC.resume().catch(()=>{});
+  GAIN.gain.value=REC?(S().boost||2):1;
+ }catch(e){}}
+function setAudioSession(t){try{if(navigator.audioSession)navigator.audioSession.type=t}catch(e){}}
+function play(){ensureAC();au.playbackRate=S().rate;const pr=au.play();if(pr&&pr.catch)pr.catch(()=>{});}
 function toggle(){if(waiting){clearWait();updPB();return}if(au.paused){if(au.currentTime>=IT.dur-0.2)au.currentTime=0;play()}else au.pause()}
-function updPB(){const b=$('pb');if(b){b.innerHTML=(au.paused&&!waiting)?ICON.play:ICON.pause;b.setAttribute('aria-label',(au.paused&&!waiting)?'再生':'一時停止')}}
+function updPB(){const pl=$('player');if(pl)pl.classList.toggle('playing',!au.paused||!!waiting||!!REC);const b=$('pb');if(b){b.innerHTML=(au.paused&&!waiting)?ICON.play:ICON.pause;b.setAttribute('aria-label',(au.paused&&!waiting)?'再生':'一時停止')}}
 function abTap(){if(A==null){A=au.currentTime}else if(B==null){B=au.currentTime;if(B<=A+0.3){A=B=null}else{au.currentTime=A;play()}}else{A=B=null}renderPlayer()}
 function gapMs(i){const st=S();const l=IT.lines[i];if(st.pause==='len')return ((l.e-l.s)/st.rate+1)*1000;return (+st.pause)*1000}
 function tick(){
@@ -393,10 +427,10 @@ function tick(){
  }
  if(!waiting)setCur(i);
  const s=$('seek');if(s&&document.activeElement!==s)s.value=t;const tn=$('tnow');if(tn)tn.textContent=fmt(t);const tl=$('tleft');if(tl)tl.textContent='-'+fmt(IT.dur-t);
- if(REC){const m=$('recmsg');if(m)m.textContent='録音中 '+fmt((Date.now()-recT0)/1000)}
+ if(REC){const el=(Date.now()-recT0)/1000;const m=$('recmsg');if(m)m.textContent=(REC.ending?'● 録音中（まもなく自動で止まります）':'● 録音中 ')+fmt(el);if(el>IT.dur/S().rate*1.8+30)stopRec()}
  raf=requestAnimationFrame(tick)}
 function flushHeard(){if(heard>=1&&IT)logSec(heard,IT.id);heard=0}
-function finishPass(){if(!IT)return;const k=stepKey();if(REC)setTimeout(stopRec,1500);
+function finishPass(){if(!IT)return;const k=stepKey();if(REC&&!REC.stopping){REC.ending=true;setTimeout(stopRec,3000)}
  if(k==='c'||k==='o'||k==='s')bump(IT.id,k);
  flushHeard();clearWait();au.pause();au.currentTime=0;cur=-1;
  const plan=planFor(DAY),rec=todayRec(IT.id);if((rec[k]||0)>=plan[step][2]&&step<plan.length-1&&k!=='s'){step++;applyStepView()}
@@ -413,27 +447,44 @@ let REC=null,RECMSG='',recT0=0;
 function recMsg(t){RECMSG=t;const m=$('recmsg');if(m)m.textContent=t}
 async function startRec(){
  if(REC)return;
+ ensureAC();
  try{const p=au.play();if(p&&p.then)p.then(()=>au.pause()).catch(()=>{})}catch(e){}
  if(!navigator.mediaDevices||!window.MediaRecorder){recMsg('このブラウザは録音に対応していません。iPhone なら Safari で開いてください。');return}
- let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
+ setAudioSession('play-and-record');
+ let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}catch(e){setAudioSession('auto');recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
  const mr=new MediaRecorder(stream,type?{mimeType:type}:undefined);const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
- REC={stream,mr,id:IT.id};recT0=Date.now();
- mr.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mr.mimeType||type||'audio/mp4'});const id=REC&&REC.id;REC=null;
-  if(blob.size<1500){recMsg('録音できませんでした。もう一度試してください。');if(IT)renderPlayer();return}
-  try{await IDB.put(recKey(id),{blob,type:blob.type,at:Date.now()});recMsg('録音を保存しました（'+fmt((Date.now()-recT0)/1000)+'）。「提出」で聞き直し・添削できます。')}catch(e){recMsg('録音を保存できませんでした（'+e.message+'）。')}
-  if(IT)renderPlayer()};
- mr.start(1000);recMsg('録音中：イヤホンで聞きながら追いかける');
+ REC={stream,mr,id:IT.id,chunks,type,done:false};recT0=Date.now();
+ mr.onstop=()=>finishRec();
+ mr.start(1000);recMsg('');
+ ensureAC();
  clearWait();au.currentTime=0;cur=-1;play();renderPlayer();
 }
-function stopRec(){if(REC&&REC.mr.state!=='inactive')REC.mr.stop()}
+async function finishRec(){
+ const r=REC;if(!r||r.done)return;r.done=true;
+ try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){}
+ const blob=new Blob(r.chunks,{type:(r.mr&&r.mr.mimeType)||r.type||'audio/mp4'});const secs=(Date.now()-recT0)/1000;REC=null;setAudioSession('auto');if(GAIN)GAIN.gain.value=1;
+ if(blob.size<1500){recMsg('録音できませんでした。もう一度試してください。');if(IT)renderPlayer();return}
+ try{await IDB.put(recKey(r.id),{blob,type:blob.type,at:Date.now()});recMsg('録音を保存しました（'+fmt(secs)+'）')}catch(e){recMsg('録音を保存できませんでした（'+e.message+'）。')}
+ if(IT)renderPlayer()}
+function stopRec(){const r=REC;if(!r||r.stopping)return;r.stopping=true;
+ try{if(r.mr.state!=='inactive'){r.mr.requestData&&r.mr.requestData();r.mr.stop()}else finishRec()}catch(e){finishRec()}
+ setTimeout(()=>{if(REC===r&&!r.done)finishRec()},2500)}
+const myAu=new Audio();let myUrl=null;
+async function myPlay(btn){
+ if(!myAu.paused){myAu.pause();btn.textContent='▶ 自分の録音';return}
+ const r=await IDB.get(recKey(IT.id)).catch(()=>null);if(!r){recMsg('今日の録音はまだありません。「● 録音」で録音できます。');return}
+ if(myUrl)URL.revokeObjectURL(myUrl);myUrl=URL.createObjectURL(r.blob);myAu.src=myUrl;au.pause();clearWait();
+ myAu.onended=()=>{btn.textContent='▶ 自分の録音'};myAu.play().then(()=>{btn.textContent='■ 止める'}).catch(()=>{})}
 function recRow(){
- const b=h('button',{class:'recbtn'+(REC?' on':''),type:'button',text:REC?'■ 録音を止める':'● 録音しながら再生',onclick:()=>{REC?stopRec():startRec()}});
- return h('div',{class:'recrow'},b,h('span',{class:'small muted num',id:'recmsg',text:REC?'録音中 '+fmt((Date.now()-recT0)/1000):RECMSG}))}
+ if(REC){const st=h('button',{class:'stopbtn',type:'button',text:'■ 録音を止める',onclick:stopRec});
+  return h('div',{class:'recrow rec-on'},h('span',{class:'num',id:'recmsg',text:'● 録音中 '+fmt((Date.now()-recT0)/1000)}),st)}
+ const my=h('button',{class:'minibtn',type:'button',text:'▶ 自分の録音'});my.onclick=()=>myPlay(my);
+ return h('div',{class:'recrow'},h('span',{class:'small muted num',id:'recmsg',text:RECMSG}),my)}
 function myRecBox(prev){
  const box=h('div',{class:'myrec'},h('div',{class:'small muted',text:prev?'前回の自分の録音':'今日の自分の録音'}));
  const find=async()=>{if(!prev)return IDB.get(recKey(IT.id));for(let i=1;i<15;i++){const d=new Date();d.setDate(d.getDate()-i);const r=await IDB.get(IT.id+'|'+ymd(d));if(r)return r}return null};
- find().then(r=>{if(!r){box.append(h('p',{class:'small muted',text:prev?'この端末に前回の録音はありません。':'まだありません。下の「● 録音しながら再生」で録音できます。'}));return}
+ find().then(r=>{if(!r){box.append(h('p',{class:'small muted',text:prev?'この端末に前回の録音はありません。':'まだありません。下の「● 録音」で録音できます。'}));return}
   const a=h('audio',{controls:true,preload:'metadata',src:URL.createObjectURL(r.blob)});box.append(a)}).catch(()=>{});
  return box}
 // ---------- Gemini ----------
@@ -501,6 +552,9 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('div',{class:'row'},h('span',{text:'速さ'}),rate,rv),
   h('div',{class:'row'},h('span',{text:'文ごとに止める'}),seg('pause',[['off','止めない'],['len','文の長さ＋1秒'],['1','1秒'],['3','3秒'],['5','5秒']])),
   h('p',{class:'small muted',text:'「文の長さ＋1秒」は Listen & Repeat の本番と同じ考え方。聞いた文と同じ長さの間に言い切る。'}),
+  (()=>{const r=h('input',{type:'range',id:'boost',min:1,max:3,step:0.25,value:st.boost,'aria-label':'録音中の音量'});const v=h('b',{class:'num',text:'×'+(+st.boost).toFixed(2)});r.oninput=()=>{setS({boost:+r.value});v.textContent='×'+(+r.value).toFixed(2);if(GAIN&&REC)GAIN.gain.value=+r.value};return h('div',{class:'row'},h('span',{text:'録音中の音量'}),r,v)})(),
+  h('div',{class:'row'},h('span',{text:'音の途切れ対策'}),seg('wa',[[true,'オン'],[false,'オフ']])),
+  h('p',{class:'small muted',text:'オンだと再生の最初が切れにくく、録音中の音量も上げられます。音が出なくなったらオフにして、ページを読み込み直してください。'}),
   h('h3',{text:'表示',style:'margin-top:12px'}),
   h('div',{class:'row'},h('span',{text:'文字の大きさ'}),fs),
   ...gemSettings(),
@@ -533,7 +587,7 @@ async function loadData(){const r=await fetch('data.enc',{cache:'no-cache'});if(
 const AUD={};
 async function audioUrl(id){if(AUD[id])return AUD[id];const r=await fetch('audio/'+id+'.enc');if(!r.ok)throw new Error('audio '+r.status);const pt=await dec(await r.arrayBuffer());return AUD[id]=URL.createObjectURL(new Blob([pt],{type:'audio/mpeg'}))}
 function lockScreen(msg){const root=$('home');root.innerHTML='';
- const inp=h('input',{type:'password',id:'pass',autocomplete:'current-password','aria-label':'合言葉',placeholder:'合言葉',class:'passin'});const m=h('p',{class:'small',id:'lockmsg',text:msg});
+ const inp=h('input',{type:'text',id:'pass',autocomplete:'off',autocapitalize:'off',autocorrect:'off',spellcheck:'false','aria-label':'合言葉',placeholder:'合言葉',class:'passin'});const m=h('p',{class:'small',id:'lockmsg',text:msg});
  const go=h('button',{class:'btn primary',type:'button',text:'開く'});
  const run=async()=>{if(!inp.value)return;go.disabled=true;m.textContent='確認中…（数秒かかります）';
   try{CRY.key=await deriveKey(inp.value,CRY.meta);await loadData();const raw=new Uint8Array(await crypto.subtle.exportKey('raw',CRY.key));try{localStorage.setItem(PFX+'k',b64e(raw))}catch(e){}renderHome()}
