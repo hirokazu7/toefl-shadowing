@@ -665,7 +665,7 @@ async function playSeg(fileId,s,e){try{const u=await audioUrl(fileId);setAudioSe
  segAu.currentTime=Math.max(0,s-0.05);await segAu.play();clearInterval(segStopT);
  return new Promise(res=>{segStopT=setInterval(()=>{if(segAu.paused||segAu.currentTime>=e){clearInterval(segStopT);segAu.pause();res()}},40)})}catch(err){}}
 function sayJa(t){return new Promise(res=>{try{if(!('speechSynthesis' in window))return res();const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';const v=speechSynthesis.getVoices().find(x=>/ja/i.test(x.lang));if(v)u.voice=v;u.rate=1.05;u.onend=res;u.onerror=res;speechSynthesis.speak(u)}catch(e){res()}})}
-function stopAllSpeak(){try{segAu.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}LH.on=false;if(LISTEN)try{LISTEN.abort()}catch(e){};if(IVREC)try{ivStop(true)}catch(e){}}
+function stopAllSpeak(){try{SL.on=false}catch(e){}try{segAu.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}LH.on=false;if(LISTEN)try{LISTEN.abort()}catch(e){};if(IVREC)try{ivStop(true)}catch(e){}}
 async function gemCall(parts,json){const st=S();if(!st.gkey)throw new Error('nokey');
  const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent((st.gmodel||DEFM).replace(/^models\//,''))+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.gkey},
   body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:Object.assign({temperature:0.2},json?{responseMimeType:'application/json'}:{})})});
@@ -827,7 +827,7 @@ function ivPrompt(q,idx){return ['あなたは TOEFL iBT（2026年からの新�
  '1. 聞こえた通りに英語で書き起こす。推測で補わない。聞き取れない所は (?)。言いよどみ（um, uh）も残す。',
  '2. 公式の採点観点（質問に十分に答えているか、理由や例で展開できているか、聞き取りやすさ・流暢さ、文法と語彙の正確さと幅）で、0〜5の予想点をつける。甘くしない。',
  '3. 良かった点と直す点を、それぞれ最大3つ書く。直す点は、言った英語 → 直した英語 → 理由（日本語）の形。',
- (idx===0?'4. この人が言いたかった内容を活かして、経験の質問用の4文の型で70〜90語の模範解答を書く：①質問に直接答える（Recently, … ／ When I was …）②理由（I did this because …）③苦労したこと（However, I found it difficult to … while …）④どう乗り越えたか（To overcome this, I …）。':'4. この人が言いたかった内容を活かして、次の型で70〜90語の模範解答を書く。答え（質問の言葉を使う）→ The main reason is that … → For example, … → (Of course, …) → So, overall, I think …'),
+ (idx===0?'4. この人が言いたかった内容を活かして、経験の質問用の4文の型で70〜90語の模範解答を書く：①質問に直接答える（Recently, … ／ When I was …）②理由（I did this because …）③苦労したこと（However, I found it difficult to … while …）④どう乗り越えたか（To overcome this, I …）。':'4. この人が言いたかった内容を活かして、70〜90語の模範解答を書く。理由は1つに絞り、自分の具体的な例を2〜3文で厚くする。型：①答え（質問の言葉を使う。好みなら I prefer A to B.／賛否なら I agree that［主張の言い換え］.／方針なら Yes, I think … should …）②The main reason is that …（誰にとって良いかをはっきり）③For example, … ④好みなら On the other hand, B …, so it doesn\'t suit me.／賛否・方針なら Of course, …, but … ⑤So, overall, I think …。学習者の経験（TOEFL と大学院、仕事と子育て、在宅勤務、福岡、AI の活用など）が使えるなら例に使う。'),
  '5. 英語にしにくそうだった所は「言いたかった日本語 → 英語にしやすい日本語 → 英語」で示す。',
  '6. 模範解答の中から、ほかの質問でも使い回せる言い回しを2〜4個（[ ] で入れ替える所を示す）。',
  '必ず次の形だけで答える（【】の見出しは変えない。前置きは書かない）：',
@@ -885,8 +885,28 @@ const SEED_PHRASES=[
  ['Discussion','〜に関する問題が多い','There are many problems regarding [名詞].','There are many problems regarding smartphone use at school.'],
  ['Discussion','〜してよいなら、…しがちだ','If [主語] are allowed to [原形], they are likely to [原形].','If students are allowed to use phones, they are likely to lose focus.'],
  ['Discussion','〜がなければ、…するだろう','Without [名詞], [主語] would [原形].','Without phones, students would talk more with friends.'],
- ['Discussion','したがって、〜と思う','Therefore, I think [結論].','Therefore, I think a complete ban works better.']];
-function stockState(){const s=LS.get('stock',null);if(s)return s;const o={phrases:SEED_PHRASES.map((p,i)=>({id:'s'+i,cat:p[0],ja:p[1],en:p[2],ex:p[3],src:'標準'})),answers:[]};LS.set('stock',o);return o}
+ ['Discussion','したがって、〜と思う','Therefore, I think [結論].','Therefore, I think a complete ban works better.'],
+ ['Q2 好み','BよりAが好き','I prefer [A] to [B].','I prefer studying at home to studying at a cafe.'],
+ ['Q2 好み','〜するとき、…と感じる','I usually feel [形容詞] when I [原形].','I usually feel relaxed when I walk along the beach.'],
+ ['Q2 好み','一方Bは〜なので、私には合わない','On the other hand, [B] [文], so it doesn\'t suit me.','On the other hand, cafes are often noisy, so they don\'t suit me.'],
+ ['Q2 好み','だから私にはAが合っている','So, [A] works better for me.','So, studying at home works better for me.'],
+ ['Q3 賛否','〜という考えに賛成だ（主張を言い換える）','I agree that [主張の言い換え].','I agree that people in cities have more chances to try new things.'],
+ ['Q3 賛否','部分的に賛成だ','I partly agree with this idea.','I partly agree with this idea.'],
+ ['Q3 賛否','もちろん〜という人もいるが','Of course, some people [文], but [文].','Of course, some people prefer quiet towns, but cities offer more jobs.'],
+ ['Q4 意見','はい、〜すべきだと思う','Yes, I think [主語] should [原形].','Yes, I think companies should let employees work from home.'],
+ ['Q4 意見','いいえ、〜すべきだとは思わない','No, I don\'t think [主語] should [原形].','No, I don\'t think schools should ban homework.'],
+ ['Q4 意見','それは〜が…するのに役立つ','It helps [人] [原形].','It helps parents spend more time with their children.'],
+ ['Q4 意見','AにもBにも良い','It is good for both [A] and [B].','It is good for both workers and companies.'],
+ ['Q4 意見','将来〜がもっと一般的になると思う','I think [名詞] will become more common in the future.','I think online classes will become more common in the future.'],
+ ['理由の作り方','（主語を変える）〜にとっては','For [人], [文].','For working parents, online classes are much easier to attend.'],
+ ['ネタ（例に使う自分の話）','大学院のために TOEFL を勉強している','I\'m preparing for the TOEFL because I want to study computer science at a graduate school in the U.S. online.','I\'m preparing for the TOEFL because I want to study computer science at a graduate school in the U.S. online.'],
+ ['ネタ（例に使う自分の話）','仕事と子育てで時間が限られている。子どもが寝た後に勉強する','I work as a software engineer while raising two children, so my time is very limited. I usually study late at night after my kids go to bed.','I work as a software engineer while raising two children, so my time is very limited. I usually study late at night after my kids go to bed.'],
+ ['ネタ（例に使う自分の話）','在宅勤務で通勤の1時間が浮き、英語に使っている','I mostly work from home, which saves me about an hour of commuting every day. I use that time to study English.','I mostly work from home, which saves me about an hour of commuting every day. I use that time to study English.'],
+ ['ネタ（例に使う自分の話）','福岡は大きいが混みすぎない。海も空港も20分','I live in Fukuoka, a city that is big but not too crowded. I can get to the beach or the airport in about twenty minutes.','I live in Fukuoka, a city that is big but not too crowded. I can get to the beach or the airport in about twenty minutes.'],
+ ['ネタ（例に使う自分の話）','以前、小さな服屋を経営していた。客の話を聞く大切さを学んだ','I used to run a small clothing shop. Through that experience, I learned how important it is to listen to customers.','I used to run a small clothing shop. Through that experience, I learned how important it is to listen to customers.'],
+ ['ネタ（例に使う自分の話）','仕事でも英語の勉強でも毎日 AI を使っている','I use AI tools every day, both for work and for studying English. For example, AI checks my essays and gives me feedback in seconds.','I use AI tools every day, both for work and for studying English. For example, AI checks my essays and gives me feedback in seconds.'],
+ ['ネタ（例に使う自分の話）','週に数回ジムに行く。夜の勉強の集中に役立つ','I go to the gym a few times a week. Exercise helps me stay focused when I study at night.','I go to the gym a few times a week. Exercise helps me stay focused when I study at night.']];
+function stockState(){let s=LS.get('stock',null);if(!s){s={phrases:[],answers:[],seedN:0}}const n=s.seedN==null?28:s.seedN;if(n<SEED_PHRASES.length){SEED_PHRASES.slice(n).forEach((p,k)=>s.phrases.push({id:'s'+(n+k),cat:p[0],ja:p[1],en:p[2],ex:p[3],src:'標準'}));s.seedN=SEED_PHRASES.length;LS.set('stock',s)}else if(s.seedN==null){s.seedN=n;LS.set('stock',s)}return s}
 function stockAdd(kind,obj){const s=stockState();obj.id=kind[0]+Date.now().toString(36)+Math.random().toString(36).slice(2,5);obj.created=today();
  const list=s[kind];if(list.some(x=>(x.en||'').trim()===(obj.en||'').trim()))return false;list.unshift(obj);LS.set('stock',s);return true}
 function stockDue(kind){const t=today();return stockState()[kind].filter(x=>!x.due||x.due<=t)}
@@ -899,7 +919,10 @@ function renderStock(){const root=$('home');root.innerHTML='';const s=stockState
   h('p',{class:'small muted',text:'何度も使えるフレーズと、添削でもらった模範解答をためて暗記する。Speaking でも Writing でも同じ言い回しを使い回す。'}));
  const seg=h('div',{class:'tabs4',style:'grid-template-columns:1fr 1fr'});[['phrases','フレーズ '+s.phrases.length],['answers','模範解答 '+s.answers.length]].forEach(([k,n])=>seg.append(h('button',{type:'button','aria-pressed':String(STK.tab===k),text:n,onclick:()=>{STK.tab=k;renderStock()}})));root.append(seg);
  const list=s[STK.tab],due=stockDue(STK.tab);
+ const catList=()=>list.filter(x=>STK.tab!=='phrases'||STK.cat==='すべて'||x.cat===STK.cat);
  root.append(h('div',{class:'skcards'},h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockPractice(STK.tab)},h('div',{class:'t',text:'暗記チェック'}),h('div',{class:'small muted',text:due.length?'今日の分 '+due.length+'件':'今日の分は終わり（全部から出す）'})),
+  h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockPractice(STK.tab,catList())},h('div',{class:'t',text:'表示中を全部'}),h('div',{class:'small muted',text:'今の分類から連続で（期限は無視）'})),
+  h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockListen(catList())},h('div',{class:'t',text:'聞き流し'}),h('div',{class:'small muted',text:'日本語 → 英語を流しっぱなし'})),
   h('button',{class:'skcard',type:'button',onclick:()=>stockAddForm()},h('div',{class:'t',text:'＋ 追加'}),h('div',{class:'small muted',text:'MMBH や自分の表現を足す'}))));
  if(STK.tab==='phrases'){const cats=['すべて',...new Set(list.map(x=>x.cat))];const cs=h('div',{class:'views',style:'margin:8px 0'});cats.forEach(c=>cs.append(h('button',{type:'button','aria-pressed':String(STK.cat===c),text:c,onclick:()=>{STK.cat=c;renderStock()}})));root.append(cs)}
  const box=h('div',{class:'list'});
@@ -923,7 +946,7 @@ function stockAddForm(){hideTabs();const root=$('home');root.innerHTML='';
    const o=kind.value==='answers'?{cat:cat.value.trim()||'自分で追加',q:ja.value.trim(),en:en.value.trim()}:{cat:cat.value.trim()||'自分で追加',ja:ja.value.trim(),en:en.value.trim(),src:'自分'};
    stockAdd(kind.value,o);STK.tab=kind.value;renderHome()}})))}
 let STP=null;
-function stockPractice(kind){hideTabs();let list=stockDue(kind);if(!list.length)list=stockState()[kind].slice();list=shuffleA(list).slice(0,15);STP={kind,list,i:0,ok:0};stockQ()}
+function stockPractice(kind,forced){hideTabs();let list=forced||stockDue(kind);if(!list.length)list=stockState()[kind].slice();list=forced?shuffleA(list):shuffleA(list).slice(0,15);STP={kind,list,i:0,ok:0};stockQ()}
 function shuffleA(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function stockQ(){const root=$('home');root.innerHTML='';const x=STP.list[STP.i];
  root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'やめる',text:'✕',onclick:()=>{stopAllSpeak();STP=null;renderHome()}}),h('div',{class:'ttl'},h('div',{text:STP.kind==='answers'?'模範解答の暗記':'フレーズの暗記'}),h('div',{class:'small muted num',text:(STP.i+1)+' / '+STP.list.length}))),
@@ -944,6 +967,19 @@ function stockReveal(said){const x=STP.list[STP.i];const root=$('home');const mb
  const go=ok=>{stockMark(STP.kind,x.id,ok);if(ok)STP.ok++;STP.i++;STP.i<STP.list.length?stockQ():stockDone()};
  box.append(h('div',{class:'row',style:'justify-content:space-between;margin-top:12px'},h('button',{class:'btn',type:'button',text:'× 言えなかった',onclick:()=>go(false)}),h('button',{class:'btn primary',type:'button',text:'○ 言えた',onclick:()=>go(true)})));
  root.append(box)}
+const SL={on:false};
+function stockListen(list){hideTabs();SL.list=shuffleA(list);SL.i=0;SL.on=true;stockListenView();stockListenLoop()}
+function stockListenView(){const root=$('home');root.innerHTML='';const x=SL.list[SL.i];
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'戻る',html:ICON.back,onclick:()=>{SL.on=false;stopAllSpeak();renderHome()}}),h('div',{class:'ttl'},h('div',{text:'ストックの聞き流し'}),h('div',{class:'small muted num',text:(SL.i+1)+' / '+SL.list.length}))),
+  h('div',{class:'qcard'},h('div',{class:'small muted',text:x.cat||''}),h('div',{class:'qja',text:x.ja||x.q||''}),h('div',{class:'ansen',style:'margin-top:12px',text:x.ex||x.en})),
+  h('div',{class:'row',style:'justify-content:center;margin-top:16px'},h('button',{class:'btn',type:'button',text:'前へ',onclick:()=>{SL.i=Math.max(0,SL.i-1);slRestart()}}),
+   h('button',{class:'btn primary',type:'button',text:SL.on?'一時停止':'再開',onclick:()=>{if(SL.on){SL.on=false;stopAllSpeak();stockListenView()}else{SL.on=true;stockListenView();stockListenLoop()}}}),
+   h('button',{class:'btn',type:'button',text:'次へ',onclick:()=>{SL.i=Math.min(SL.list.length-1,SL.i+1);slRestart()}})))}
+function slRestart(){stopAllSpeak();SL.on=true;stockListenView();setTimeout(stockListenLoop,150)}
+async function stockListenLoop(){const my=Symbol();SL.tok=my;
+ while(SL.on&&SL.tok===my){const x=SL.list[SL.i];if(x.ja||x.q)await sayJa(x.ja||x.q);if(!SL.on||SL.tok!==my)return;await new Promise(r=>setTimeout(r,1200));
+  for(let k=0;k<2;k++){if(!SL.on||SL.tok!==my)return;await sayEn(x.ex||x.en);await new Promise(r=>setTimeout(r,900))}
+  if(!SL.on||SL.tok!==my)return;SL.i=(SL.i+1)%SL.list.length;stockListenView()}}
 function stockDone(){const root=$('home');root.innerHTML='';root.append(h('div',{class:'sumbox'},h('div',{class:'streakbig num',text:'🔥 '+streakDays()+' day'}),h('div',{class:'big num',text:STP.ok+' / '+STP.list.length}),h('p',{class:'small muted',text:'言えなかったものは明日また出ます。'})),
  h('div',{class:'row',style:'justify-content:center'},h('button',{class:'btn',type:'button',text:'ストックへ',onclick:()=>{STP=null;renderHome()}})))}
 function phraseRow(p,src){const b=h('button',{class:'minibtn',type:'button',text:'＋ストック'});b.onclick=()=>{const ok=stockAdd('phrases',{cat:src,ja:p.t||'',en:p.p||p.t,src:'添削'});b.textContent=ok?'追加済み':'登録済み';b.disabled=true};
