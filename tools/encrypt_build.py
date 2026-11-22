@@ -21,9 +21,13 @@ def enc(b,path=None):
         except Exception: pass
     iv=os.urandom(12);return iv+g.encrypt(iv,b,None)
 os.makedirs(os.path.join(out,'audio'),exist_ok=True)
-items=json.load(open(items_p))
-dp=os.path.join(out,'data.enc');d=enc(json.dumps(items,ensure_ascii=False,separators=(',',':')).encode(),dp);open(dp,'wb').write(d)
-for it in items:
-    ap=os.path.join(out,'audio',it['id']+'.enc');d=enc(open(os.path.join(audio_d,it['id']+'.mp3'),'rb').read(),ap);open(ap,'wb').write(d)
+obj=json.load(open(items_p))
+if isinstance(obj,dict):
+    items=obj['items'];extra=obj.get('audio',[]);payload={'items':items,'speak':obj.get('speak',{})}
+else:
+    items=obj;extra=[];payload=items
+dp=os.path.join(out,'data.enc');d=enc(json.dumps(payload,ensure_ascii=False,separators=(',',':')).encode(),dp);open(dp,'wb').write(d)
+for aid in [it['id'] for it in items]+extra:
+    ap=os.path.join(out,'audio',aid+'.enc');d=enc(open(os.path.join(audio_d,aid+'.mp3'),'rb').read(),ap);open(ap,'wb').write(d)
 json.dump({'v':1,'salt':salt.hex(),'iter':ITER},open(meta_p,'w'))
 print('items',len(items))
