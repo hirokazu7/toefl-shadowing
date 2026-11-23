@@ -294,7 +294,7 @@ const au=$('au');let IT=null,DAY=1,step=0,cur=-1,loop=false,A=null,B=null,waitin
 function openItem(id){IT=ITEMS.find(i=>i.id===id);DAY=dayNo(id);const plan=planFor(DAY),rec=todayRec(id);step=plan.findIndex(([k,,t])=>(rec[k]||0)<t);if(step<0)step=plan.findIndex(p=>p[0]==='s');
  cur=-1;loop=false;A=B=null;clearWait();au.removeAttribute('src');audioUrl(id).then(u=>{if(IT&&IT.id===id){au.src=u;au.load()}}).catch(()=>{});au.playbackRate=S().rate;try{au.preservesPitch=true}catch(e){}
  $('home').hidden=true;$('player').hidden=false;applyStepView();renderPlayer();window.scrollTo(0,0)}
-function closeItem(){au.pause();clearWait();flushHeard();$('player').hidden=true;$('home').hidden=false;IT=null;renderHome()}
+function closeItem(){if(REC)stopRec();au.pause();clearWait();flushHeard();$('player').hidden=true;$('home').hidden=false;IT=null;renderHome()}
 function stepKey(){return planFor(DAY)[step][0]}
 function applyStepView(){const k=stepKey();const v={c:'hide',o:'en',s:'hide',sub:'hide',fb:'en'}[k];setS({view:v,pause:(IT.cat==='lr'&&k!=='o')?'len':'off'})}
 function renderPlayer(){
@@ -340,6 +340,7 @@ function renderPlayer(){
  bar.append(recRow());
  if(A!=null)bar.append(h('div',{class:'counter num',text:'A '+fmt(A)+(B!=null?' 〜 B '+fmt(B):'')}));
  root.append(bar);
+ updPB();
  scrollCur();
 }
 function markup(l){const s=l.en;if(!l.mk||!l.mk.length)return esc(s);let out='',p=0;
@@ -511,7 +512,7 @@ async function finishRec(){
  // iPhone の Safari は「停止」の合図のあとに音声データが届くことがあるので、データが来るまで待つ
  for(let t=0;!r.chunks.length&&t<3000;t+=100)await gwait(100);await gwait(200);
  try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){}
- const blob=new Blob(r.chunks,{type:(r.mr&&r.mr.mimeType)||r.type||'audio/mp4'});const secs=(Date.now()-recT0)/1000;REC=null;setAudioSession('playback');if(GAIN)GAIN.gain.value=1;
+ const blob=new Blob(r.chunks,{type:(r.mr&&r.mr.mimeType)||r.type||'audio/mp4'});const secs=(Date.now()-recT0)/1000;REC=null;setAudioSession('playback');if(GAIN)GAIN.gain.value=1;au.pause();clearWait();updPB();
  if(blob.size<1500){recMsg('録音できませんでした（'+blob.size+'バイト・'+(blob.type||'形式不明')+'）。もう一度押して、だめならこの文をそのまま Claude に送ってください。');if(IT)renderPlayer();return}
  try{await IDB.put(recKey(r.id),{blob,type:blob.type,at:Date.now()});recMsg('録音を保存しました（'+fmt(secs)+'）')}catch(e){recMsg('録音を保存できませんでした（'+e.message+'）。')}
  if(IT)renderPlayer()}
@@ -528,7 +529,9 @@ function recRow(){
  if(REC){const st=h('button',{class:'stopbtn',type:'button',text:'■ 録音を止める',onclick:stopRec});
   return h('div',{class:'recrow rec-on'},h('span',{class:'num',id:'recmsg',text:'● 録音中 '+fmt((Date.now()-recT0)/1000)}),st)}
  const my=h('button',{class:'minibtn',type:'button',text:'▶ 自分の録音'});my.onclick=()=>myPlay(my);
- return h('div',{class:'recrow'},h('span',{class:'small muted num',id:'recmsg',text:RECMSG}),my)}
+ const si=planFor(DAY).findIndex(p=>p[0]==='sub');
+ const toSub=si>=0&&stepKey()!=='sub'&&/保存しました/.test(RECMSG)?h('button',{class:'minibtn',type:'button',text:'提出・添削へ →',onclick:()=>{step=si;applyStepView();renderPlayer();const sc=$('script');if(sc)sc.scrollTop=sc.scrollHeight}}):null;
+ return h('div',{class:'recrow'},h('span',{class:'small muted num',id:'recmsg',text:RECMSG}),h('div',{class:'row',style:'margin:0;gap:6px'},toSub,my))}
 function myRecBox(prev){
  const box=h('div',{class:'myrec'},h('div',{class:'small muted',text:prev?'前回の自分の録音':'今日の自分の録音'}));
  const find=async()=>{if(!prev)return IDB.get(recKey(IT.id));for(let i=1;i<15;i++){const d=new Date();d.setDate(d.getDate()-i);const r=await IDB.get(IT.id+'|'+ymd(d));if(r)return r}return null};
@@ -634,7 +637,7 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));
  sh.hidden=false;$('shade').hidden=false}
 function closeSheet(){$('sheet').hidden=true;$('shade').hidden=true;if(IT)renderPlayer();else renderHome()}
-const BUILD={"v": "11/23 23:10", "files": {"data.enc": "478b074823d78bd0", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
+const BUILD={"v": "11/24 02:06", "files": {"data.enc": "478b074823d78bd0", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
 // GitHub 上のファイルが、この版で作ったものと同じかを確かめる
 async function siteCheck(out){const names=Object.keys(BUILD.files);if(!names.length){out.textContent='確認用の情報がありません。';return}
  const bad=[],miss=[];let n=0;
@@ -679,22 +682,38 @@ async function playSeg(fileId,s,e){try{const u=await audioUrl(fileId);setAudioSe
  return new Promise(res=>{segStopT=setInterval(()=>{if(segAu.paused||segAu.currentTime>=e){clearInterval(segStopT);segAu.pause();res()}},40)})}catch(err){}}
 function sayJa(t){return new Promise(res=>{try{if(!('speechSynthesis' in window))return res();const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';const v=speechSynthesis.getVoices().find(x=>/ja/i.test(x.lang));if(v)u.voice=v;u.rate=1.05;u.onend=res;u.onerror=res;speechSynthesis.speak(u)}catch(e){res()}})}
 function stopAllSpeak(){try{SL.on=false}catch(e){}try{segAu.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}LH.on=false;if(LISTEN)try{LISTEN.abort()}catch(e){};if(IVREC)try{ivStop(true)}catch(e){}}
-const GEM_FB=['gemini-flash-latest','gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.0-flash'];
+const GEM_FB=['gemini-flash-latest','gemini-2.5-flash','gemini-flash-lite-latest','gemini-2.5-flash-lite'];
 const gwait=ms=>new Promise(r=>setTimeout(r,ms));
+// この API キーで今使えるモデルを Google に聞いて、flash 系を優先して並べる（モデルの入れ替わりに強くする）
+let GEM_LIST=null;
+async function gemModels(key){
+ if(GEM_LIST)return GEM_LIST;
+ try{const c=LS.get('gmlist',null);if(c&&c.d===today()&&c.m&&c.m.length)return GEM_LIST=c.m}catch(e){}
+ try{const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',{headers:{'x-goog-api-key':key}});const j=await res.json().catch(()=>({}));
+  if(!res.ok)return GEM_FB;
+  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')&&/^models\/gemini/i.test(m.name)&&!/tts|image|embedding|live|native-audio|computer-use|robotics|thinking|exp/i.test(m.name)).map(m=>m.name.replace(/^models\//,''));
+  const ver=m=>{const x=m.match(/gemini-(\d+(?:\.\d+)?)/);return x?+x[1]:0};
+  const rank=m=>(/flash/.test(m)&&!/lite/.test(m)?0:/flash-lite|flash.*lite/.test(m)?2:/pro/.test(m)?3:4)*1000-(/latest/.test(m)?500:0)-ver(m)*10+(/preview/.test(m)?5:0);
+  const out=ms.sort((a,b)=>rank(a)-rank(b)).slice(0,5);if(!out.length)return GEM_FB;
+  LS.set('gmlist',{d:today(),m:out});return GEM_LIST=out}catch(e){return GEM_FB}}
 // 混雑（503など）は待って再試行し、だめなら別のモデルに切り替える
 async function gemCall(parts,json,onStat){const st=S();if(!st.gkey)throw new Error('nokey');
- const first=(st.gmodel||DEFM).replace(/^models\//,'');const models=[first].concat(GEM_FB.filter(m=>m!==first));let last='';
+ const first=(st.gmodel||DEFM).replace(/^models\//,'');const list=await gemModels(st.gkey);
+ const models=[first].concat(list.filter(m=>m!==first)).slice(0,5);const seen=[];let last='',firstGone=false;
  for(const m of models){
   for(let a=0;a<2;a++){let res,j;
    try{res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.gkey},
     body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:Object.assign({temperature:0.2},json?{responseMimeType:'application/json'}:{})})});j=await res.json().catch(()=>({}))}
-   catch(e){last='通信できませんでした（'+e.message+'）';if(onStat)onStat('通信をやり直しています…');await gwait(1500);continue}
-   if(res.ok)return (((j.candidates||[])[0]||{}).content||{parts:[]}).parts.map(p=>p.text||'').join('\n');
-   last=apiErr(res.status,j);
-   if(res.status>=500){if(onStat)onStat('Gemini が混雑中。'+(a?'別のモデルに切り替えます…':'少し待って再送します…'));await gwait(a?3000:1500);continue}
-   if(res.status===429||res.status===404){if(onStat)onStat(m+' が使えないので、別のモデルで試します…');break}
+   catch(e){last='通信できませんでした（'+e.message+'）';seen.push('net');if(onStat)onStat('通信をやり直しています…');await gwait(1500);continue}
+   if(res.ok){if(firstGone&&m!==first)setS({gmodel:m});return (((j.candidates||[])[0]||{}).content||{parts:[]}).parts.map(p=>p.text||'').join('\n')}
+   seen.push(res.status);last=apiErr(res.status,j);
+   if(res.status>=500){if(onStat)onStat('Gemini が混雑中。'+(a?'別のモデル（'+m+' 以外）で試します…':'少し待って再送します…'));await gwait(a?3000:1500);continue}
+   if(res.status===429||res.status===404){if(res.status===404&&m===first)firstGone=true;if(onStat)onStat(m+' が使えないので、別のモデルで試します…');break}
    throw new Error(last)}}
- throw new Error(last+'（4つのモデルで試しましたが失敗。数分おいてもう一度）')}
+ GEM_LIST=null;try{LS.set('gmlist',null)}catch(e){}
+ if(seen.some(x=>x>=500))throw new Error('Gemini が混雑していて、'+models.length+'つのモデルすべてで断られました。数分おいてもう一度押してください（録音は保存されています）。');
+ if(seen.includes(429))throw new Error(apiErr(429,{}));
+ throw new Error(last)}
 // ---------- grading ----------
 const CONTR={"i'm":"i am","you're":"you are","we're":"we are","they're":"they are","he's":"he is","she's":"she is","it's":"it is","that's":"that is","there's":"there is","what's":"what is","i've":"i have","you've":"you have","we've":"we have","they've":"they have","i'll":"i will","you'll":"you will","we'll":"we will","he'll":"he will","she'll":"she will","it'll":"it will","they'll":"they will","i'd":"i would","you'd":"you would","don't":"do not","doesn't":"does not","didn't":"did not","isn't":"is not","aren't":"are not","wasn't":"was not","weren't":"were not","haven't":"have not","hasn't":"has not","hadn't":"had not","won't":"will not","can't":"can not","cannot":"can not","couldn't":"could not","shouldn't":"should not","wouldn't":"would not","let's":"let us"};
 const NUMW={'1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten','50':'fifty','100':'one hundred','2020':'twenty twenty'};
