@@ -209,6 +209,20 @@ input,select,textarea,.pastebox,.passin{box-sizing:border-box;max-width:100%}
 /* iPhone は16px未満の入力欄を触ると画面が拡大されるので16pxにする */
 input[type=text],input[type=password],input:not([type]),textarea,select{font-size:16px!important}
 #stCat{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);color:var(--ink)}
+.kstrip{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.ks{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);transition:background .2s,border-color .2s,opacity .2s}
+.ks .kh{display:flex;gap:8px;align-items:baseline}.ks .kh span:nth-child(2){flex:1}
+.ks .en{font-size:15px;margin-top:2px;color:var(--ink)}
+.ks.on{border-color:var(--accent);border-left-color:var(--accent);background:var(--chip)}
+.ks.done{opacity:.5}
+.kstep{margin:12px 0}.kt{font-weight:700;margin-bottom:6px}
+.kopts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.kopt{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:15px;text-align:left}
+.kopt[aria-pressed=true]{border-color:var(--accent);background:var(--chip);font-weight:700}
+.ktimer{margin-left:auto;font-size:20px}.okc{color:var(--good)}.ngc{color:var(--bad)}
+.kchk{margin:6px 0}.kchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.kc2{border-radius:999px;padding:2px 10px;font-size:13px;border:1px solid var(--line)}
+.kc2.ok{color:var(--good);border-color:var(--good)}.kc2.ng{color:var(--bad);border-color:var(--bad)}.kc2.mid{color:var(--muted)}
 </style>
 </head><body><div id="home" class="wrap"></div>
 <div id="player" class="wrap player" hidden></div>
@@ -654,7 +668,7 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));
  sh.hidden=false;$('shade').hidden=false}
 function closeSheet(){$('sheet').hidden=true;$('shade').hidden=true;if(IT)renderPlayer();else renderHome()}
-const BUILD={"v": "11/24 23:16", "files": {"data.enc": "478b074823d78bd0", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
+const BUILD={"v": "11/25 12:29", "files": {"data.enc": "27edc8749ec911be", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
 // GitHub 上のファイルが、この版で作ったものと同じかを確かめる
 async function siteCheck(out){const names=Object.keys(BUILD.files);if(!names.length){out.textContent='確認用の情報がありません。';return}
  const bad=[],miss=[];let n=0;
@@ -866,6 +880,13 @@ function renderIV(){const root=$('home');root.innerHTML='';const st=ivState();
   h('p',{class:'small muted',text:'TOEFL の Take an Interview と同じ形。質問を聞いたら準備なしで45秒話す。4問で1セット。'}));
  const cnt=h('div',{class:'skcard',style:'margin:10px 0'},h('div',{class:'t',text:'今日の回答'}),h('div',{class:'small muted num',id:'ivCnt',text:'数えています…'}));root.append(cnt);
  IDB.all().then(rs=>{const t='|'+today();const n=rs.filter(r=>String(r.k).startsWith('iv:')&&String(r.k).endsWith(t)).length;const e=$('ivCnt');if(e)e.textContent=n+' / 8 問（1日2セットが目標）'+(n>=8?' ✓ 達成':'')}).catch(()=>{});
+ const ks=kataState();
+ root.append(h('h2',{class:'skh',text:'型トレーニング（話す順番を体に入れる）'}),
+  h('p',{class:'small muted',text:'Q2〜Q4：答え → 理由は1つ → 自分の例 → 反対側に一言 → 締め。Q1：答え → 理由 → 苦労 → 乗り越え方。'}),
+  h('div',{class:'skcards'},
+   h('button',{class:'skcard',type:'button',onclick:()=>kataStart('bone')},h('div',{class:'t',text:'① 骨組み'}),h('div',{class:'small muted',text:'声を出さずに、立場・理由・例を15秒で決める'+(ks.bone?'（'+ks.bone+'問・平均'+Math.round(ks.boneSec/ks.bone)+'秒）':'')})),
+   h('button',{class:'skcard',type:'button',onclick:()=>kataStart('guide')},h('div',{class:'t',text:'② ガイドつきで話す'}),h('div',{class:'small muted',text:'45秒。いま話す段が光る'+(ks.guide?'（'+ks.guide+'回）':'')}))),
+  h('h2',{class:'skh',text:'③ 本番（ガイドなし・テーマごとに Q1〜Q4）'}));
  const l=h('div',{class:'list'});
  SP.topics.forEach(tp=>{const f=st.fb[tp.id]||{};const done=Object.keys(f).length;
   l.append(h('button',{class:'item',type:'button',onclick:()=>ivStart(tp.id)},h('div',{style:'min-width:0'},h('div',{class:'t',text:tp.t}),h('div',{class:'meta',text:done?'添削 '+done+' / 4 問':'未学習'})),h('div',{class:'dots'},[0,1,2,3].map(i=>h('i',{class:f[i]?'on':''})))))});
@@ -891,7 +912,8 @@ async function ivBody(){const b=$('ivBody');if(!b)return;b.innerHTML='';const i=
  if(!S().gkey&&r)b.append(h('p',{class:'small muted',text:'添削にはホームの設定で Gemini の API キーを入れてください。'}));
  if(fb)b.append(ivFbCard(fb));
  const nav=h('div',{class:'row',style:'justify-content:space-between;margin-top:10px'});
- if(i<3)nav.append(h('span'),h('button',{class:'btn',type:'button',text:'次の質問へ',onclick:()=>{IVS.i++;ivQ(true)}}));
+ if(IVS.kata)nav.append(h('span'),h('button',{class:'btn',type:'button',text:'次の問題へ',onclick:()=>{stopAllSpeak();KT&&KT.mode==='bone'?kataBone(true):kataGuide(false)}}));
+ else if(i<3)nav.append(h('span'),h('button',{class:'btn',type:'button',text:'次の質問へ',onclick:()=>{IVS.i++;ivQ(true)}}));
  b.append(nav)}
 async function ivRec(){if(IVREC)return;ensureAC();if(LISTEN){try{LISTEN.abort()}catch(e){}LISTEN=null}
  if(!navigator.mediaDevices||!window.MediaRecorder){$('ivMsg')&&($('ivMsg').textContent='このブラウザは録音に対応していません。');return}
@@ -902,13 +924,62 @@ async function ivRec(){if(IVREC)return;ensureAC();if(LISTEN){try{LISTEN.abort()}
  let mr;try{mr=new MediaRecorder(stream,type?{mimeType:type}:undefined)}catch(e){try{mr=new MediaRecorder(stream)}catch(e2){return ivFail('録音を始められませんでした（'+e2.name+'）。')}}
  const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
  IVREC={mr,stream,chunks,t0:Date.now(),key:ivKey(IVS.i),type};mr.onstop=()=>ivFinish();
- try{mr.start()}catch(e){return ivFail('録音を始められませんでした（'+e.name+'）。')}ivBody();
- IVREC.tick=setInterval(()=>{if(!IVREC)return;const left=45-Math.floor((Date.now()-IVREC.t0)/1000);const t=$('ivT');if(t)t.textContent=String(Math.max(0,left));if(left<=0)ivStop()},250)}
+ try{mr.start()}catch(e){return ivFail('録音を始められませんでした（'+e.name+'）。')}ivBody();if(IVS.kata){const k=$('kStrip');if(k)k.scrollIntoView({behavior:'smooth',block:'start'})}
+ IVREC.tick=setInterval(()=>{if(!IVREC)return;const left=45-Math.floor((Date.now()-IVREC.t0)/1000);const t=$('ivT');if(t)t.textContent=String(Math.max(0,left));if(IVS&&IVS.kata)kataTick((Date.now()-IVREC.t0)/1000);if(left<=0)ivStop()},250)}
 function ivStop(discard){const r=IVREC;if(!r)return;clearInterval(r.tick);r.discard=!!discard;try{r.mr.state!=='inactive'?r.mr.stop():ivFinish()}catch(e){ivFinish()}setTimeout(()=>{if(IVREC===r)ivFinish()},2500)}
 async function ivFinish(){const r=IVREC;if(!r||r.done)return;r.done=true;for(let t=0;!r.discard&&!r.chunks.length&&t<3000;t+=100)await gwait(100);if(!r.discard)await gwait(200);IVREC=null;try{r.stream.getTracks().forEach(t=>t.stop())}catch(e){}setAudioSession('playback');
  if(r.discard)return;const blob=new Blob(r.chunks,{type:r.mr.mimeType||r.type||'audio/mp4'});
  if(blob.size>1500){const secs=(Date.now()-r.t0)/1000;let sv=blob;try{sv=await fixMono(blob)}catch(e){}await IDB.put(r.key,{blob:sv,type:sv.type,at:Date.now(),secs}).catch(()=>{});logN('iv')}
+ if(IVS&&IVS.kata){kataTick(-1);if(blob.size>1500){const k=kataState();kataSave({guide:k.guide+1})}}
  if(IVS)ivBody();if(blob.size<=1500){const x=$('ivMsg');if(x)x.textContent='録音できませんでした（'+blob.size+'バイト）。もう一度押してください。'}}
+// ---------- 型トレーニング：骨組み（声なし）→ ガイドつきで話す → 本番 ----------
+const QTYPE=['経験','好み','賛否','意見'];
+const KSTEP={1:[['①','直接答える','Recently, I … ／ When I was …, I …',0,8],['②','理由','I did this because …',8,16],['③','苦労したこと','However, I found it difficult to … while …',16,28],['④','乗り越え方','To overcome this, I …',28,40],['⑤','締め','So, overall, it was a great experience.',40,45]],
+ x:[['①','答え','',0,6],['②','理由は1つだけ','The main reason is that …',6,14],['③','自分の例を2〜3文','For example, when I … ／ In my case, …',14,32],['④','反対側に一言','Of course, … but …',32,39],['⑤','締め（①を言い直す）','So, overall, I think …',39,45]]};
+const KOPEN={2:'I prefer A to B.',3:'I agree that … ／ I partly agree with this idea.',4:'Yes, I think … should … ／ No, I don\'t think …'};
+function kataSteps(i,pick){
+ if(i===0)return KSTEP[1].map(s=>({n:s[0],t:s[1],en:s[2],a:s[3],b:s[4]}));
+ return KSTEP.x.map((s,k)=>{let en=k===0?KOPEN[i+1]:s[2];
+  if(pick){if(k===0&&pick.st)en=pick.st.en;if(k===1&&pick.rs)en='The main reason is that '+pick.rs.en+'.';if(k===3&&pick.other)en='Of course, '+pick.other.pro.en+', but for me, this point matters more.'}
+  return {n:s[0],t:s[1],en,a:s[3],b:s[4]}})}
+function kataStrip(i,pick,id){return h('div',{class:'kstrip',id:id||'kStrip'},kataSteps(i,pick).map(s=>h('div',{class:'ks','data-a':s.a,'data-b':s.b},h('div',{class:'kh'},h('b',{text:s.n}),h('span',{text:s.t}),h('span',{class:'small muted num',text:s.a+'〜'+s.b+'秒'})),s.en?h('div',{class:'en',text:s.en}):null)))}
+function kataTick(sec){document.querySelectorAll('#kStrip .ks').forEach(el=>{const a=+el.dataset.a,b=+el.dataset.b;el.classList.toggle('on',sec>=a&&sec<b);el.classList.toggle('done',sec>=b)})}
+function kataState(){return Object.assign({bone:0,boneSec:0,guide:0,type:'all'},LS.get('kata',{}))}
+function kataSave(p){LS.set('kata',Object.assign(kataState(),p))}
+let KT=null;
+function kataPickQ(type,mode){const pool=[];
+ SP.topics.forEach(tp=>tp.q.forEach((q,i)=>{const T=i+1;if(mode==='bone'&&(T===1||!(SP.kata&&SP.kata[tp.id]&&SP.kata[tp.id][i])))return;if(type!=='all'&&+type!==T)return;pool.push({tp,i})}));
+ const last=KT&&KT.q;let c=pool.filter(x=>!last||x.tp!==last.tp||x.i!==last.i);if(!c.length)c=pool;return c[Math.floor(Math.random()*c.length)]}
+function kataQuit(){stopAllSpeak();if(KT)clearInterval(KT.tid);KT=null;IVS=null;renderHome()}
+function kataStart(mode){hideTabs();let t=kataState().type;if(mode==='bone'&&+t===1)t='all';KT={mode,type:t,n:0};mode==='bone'?kataBone(true):kataGuide(false)}
+function kataTypes(list,onPick){return h('div',{class:'cats',style:'margin:8px 0'},list.map(([v,n])=>h('button',{type:'button','aria-pressed':String(String(KT.type)===String(v)),text:n,onclick:()=>{KT.type=v;kataSave({type:v});onPick()}})))}
+function kataQcard(tp,i,ja){return h('div',{class:'qcard'},h('div',{class:'small muted',text:'Q'+(i+1)+' '+QTYPE[i]}),h('div',{class:'ansen',text:tp.q[i].en}),ja?h('div',{class:'small muted',style:'margin-top:4px',text:ja}):null,h('div',{class:'row',style:'margin:8px 0 0'},h('button',{class:'minibtn',type:'button',text:'🔊 質問を聞く',onclick:()=>playSeg('iv_'+tp.id.slice(2),tp.q[i].s,tp.q[i].e)})))}
+function kataBone(next){clearInterval(KT.tid);
+ if(next||!KT.q){KT.q=kataPickQ(KT.type,'bone');KT.pick={};KT.t0=Date.now();KT.n++}
+ const {tp,i}=KT.q,K=SP.kata[tp.id][i],P=KT.pick,root=$('home');root.innerHTML='';
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'やめる',text:'✕',onclick:kataQuit}),h('div',{class:'ttl'},h('div',{text:'① 骨組みを決める（声は出さない）'}),h('div',{class:'small muted num',text:KT.n+'問目・目標は15秒以内'})),h('b',{class:'ktimer num',id:'kTimer',text:(P.sec!=null?P.sec:Math.floor((Date.now()-KT.t0)/1000))+'秒'})));
+ root.append(kataTypes([['all','ランダム'],[2,'Q2 好み'],[3,'Q3 賛否'],[4,'Q4 意見']],()=>kataBone(true)));
+ root.append(kataQcard(tp,i,K.ja));
+ const step=(title,kids,hint)=>h('div',{class:'kstep'},h('div',{class:'kt',text:title}),h('div',{class:'kopts'},kids),hint?h('div',{class:'small muted',text:hint}):null);
+ root.append(step('① 立場は？',K.st.map((s,k)=>h('button',{type:'button',class:'kopt','aria-pressed':String(P.st===s),text:s.ja,onclick:()=>{P.st=s;P.other=K.st[1-k];P.rs=null;P.ex=false;kataBone()}}))));
+ if(P.st)root.append(step('② 理由を1つだけ',P.st.rs.map(r=>h('button',{type:'button',class:'kopt','aria-pressed':String(P.rs===r),text:r.ja,onclick:()=>{P.rs=r;kataBone()}})).concat([h('button',{type:'button',class:'kopt','aria-pressed':String(!!(P.rs&&P.rs.own)),text:'自分で考えた理由',onclick:()=>{P.rs={own:1,ja:'自分の理由',en:'…'};kataBone()}})]),'出てこなければ主語を変える：自分 → 生徒・親・会社にとって'));
+ if(P.rs)root.append(step('③ 例にする自分の話を1つ',[h('button',{type:'button',class:'kopt','aria-pressed':String(!!P.ex),text:'思い浮かんだ',onclick:()=>{if(!P.ex){P.ex=true;P.sec=Math.round((Date.now()-KT.t0)/1000);const s=kataState();kataSave({bone:s.bone+1,boneSec:s.boneSec+P.sec})}kataBone()}})],'勉強・仕事・家族・住んでいる町・昔の経験から1つ。英語にしやすい場面を選ぶ'));
+ if(P.ex){const ok=P.sec<=15;
+  root.append(h('div',{class:'anscard'},h('div',{class:'row',style:'margin:0;justify-content:space-between'},h('b',{text:'この骨組みで話す'}),h('span',{class:'small num '+(ok?'okc':'ngc'),text:P.sec+'秒'+(ok?' ✓':'（目標15秒）')})),
+   kataStrip(i,{st:P.st,rs:P.rs.own?null:P.rs,other:P.other},'kPrev'),
+   h('p',{class:'small muted',text:'④ は相手側の言い分を認めてから返す一言。③ は自分の話を2〜3文で。'})));
+  root.append(h('div',{class:'row',style:'justify-content:space-between'},h('button',{class:'btn',type:'button',text:'次の問題',onclick:()=>kataBone(true)}),h('button',{class:'btn primary',type:'button',text:'声に出して言う（ガイドつき）',onclick:()=>kataGuide(true)})));
+  const m=tp.m&&tp.m[i];if(m)root.append(h('details',{class:'typebox'},h('summary',{class:'small muted',text:'模範解答を見る（型どおりに並んでいる）'}),h('p',{class:'small en',text:m})));
+ }else KT.tid=setInterval(()=>{const e=$('kTimer');if(!e||!KT){clearInterval(KT&&KT.tid);return}const s=Math.floor((Date.now()-KT.t0)/1000);e.textContent=s+'秒';e.classList.toggle('ngc',s>15)},500)}
+function kataGuide(fromBone){if(KT)clearInterval(KT.tid);
+ if(!fromBone){KT.q=kataPickQ(KT.type,'guide');KT.pick=null}
+ const {tp,i}=KT.q,P=KT.pick;const pick=P&&P.st?{st:P.st,rs:P.rs&&!P.rs.own?P.rs:null,other:P.other}:null;
+ IVS={tp,i,memo:'',kata:{pick}};const root=$('home');root.innerHTML='';
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'やめる',text:'✕',onclick:kataQuit}),h('div',{class:'ttl'},h('div',{text:'② 型にそって話す（ガイドつき）'}),h('div',{class:'small muted',text:'録音中は、いま話す段が光る'}))));
+ if(!fromBone)root.append(kataTypes([['all','ランダム'],[1,'Q1 経験'],[2,'Q2 好み'],[3,'Q3 賛否'],[4,'Q4 意見']],()=>kataGuide(false)));
+ const K=SP.kata&&SP.kata[tp.id]&&SP.kata[tp.id][i];root.append(kataQcard(tp,i,K&&K.ja));
+ root.append(kataStrip(i,pick),h('p',{class:'small muted',style:'margin:6px 2px',text:'ガイドより遅れても止まらずに話し続ける。黙るより、短い文でつなぐ方が点になる。'}));
+ const body=h('div',{id:'ivBody'});root.append(body);ivBody()}
 function ivPrompt(q,idx){return ['あなたは TOEFL iBT（2026年からの新形式）の Speaking「Take an Interview」の採点に詳しい英語コーチです。添付の音声は、日本人学習者が次の質問に準備なしで45秒以内で答えた録音です。',
  '質問：'+q,
  '手順：',
@@ -919,7 +990,7 @@ function ivPrompt(q,idx){return ['あなたは TOEFL iBT（2026年からの新�
  '5. 英語にしにくそうだった所は「言いたかった日本語 → 英語にしやすい日本語 → 英語」で示す。',
  '6. 模範解答の中から、ほかの質問でも使い回せる言い回しを2〜4個（[ ] で入れ替える所を示す）。',
  '必ず次の形だけで答える（【】の見出しは変えない。前置きは書かない）：',
- '【書き起こし】','（書き起こし）','【予想点】（数字）/5','【Good】','- （フレーズ） | （説明）','【Development】','- （言った英語） | （直した英語。理由）','【模範解答】','（英文）','【言い換え】','- （言いたかった日本語） | （英語にしやすい日本語） | （英語）','【使えるフレーズ】','- （英語の言い回し） | （日本語の意味）','【次に直す1点】','（1文）'].join('\n')}
+ '【書き起こし】','（書き起こし）','【予想点】（数字）/5','【型チェック】',...(idx===0?['- ① 直接答える | ○ か ×（短い理由）','- ② 理由 | ○ か ×','- ③ 苦労したこと | ○ か ×','- ④ 乗り越え方 | ○ か ×','- ⑤ 締め | ○ か ×']:['- ① 答え | ○ か ×（短い理由）','- ② 理由は1つ | ○ か ×','- ③ 自分の例 | ○ か ×','- ④ 反対側に一言 | ○ か ×','- ⑤ 締め | ○ か ×']),'【Good】','- （フレーズ） | （説明）','【Development】','- （言った英語） | （直した英語。理由）','【模範解答】','（英文）','【言い換え】','- （言いたかった日本語） | （英語にしやすい日本語） | （英語）','【使えるフレーズ】','- （英語の言い回し） | （日本語の意味）','【次に直す1点】','（1文）'].join('\n')}
 async function ivGrade(btn,msg){const r=await IDB.get(ivKey(IVS.i)).catch(()=>null);if(!r)return;if(!S().gkey){msg.textContent='ホームの設定で Gemini の API キーを入れてください。';return}
  btn.disabled=true;msg.textContent='Gemini に送っています…（20〜60秒）';const tp=IVS.tp,i=IVS.i;
  try{let data,mime;try{const w=await toWav16k(r.blob);data=await blobB64(w);mime='audio/wav'}catch(e){data=await blobB64(r.blob);mime=(r.type||'audio/mp4').split(';')[0]}
@@ -931,10 +1002,11 @@ function parseIV(txt){const t=txt.replace(/\r/g,'').replace(/\*\*/g,'').replace(
  const get=k=>{const key=Object.keys(sec).find(x=>x.replace(/\s/g,'').toLowerCase().includes(k));return key!=null?sec[key]:''};
  const items=s=>s.split('\n').map(x=>x.trim()).filter(x=>/^[-・*•\d]/.test(x)).map(x=>x.replace(/^([-・*•]|\d+[.)．])\s*/,'')).filter(Boolean).map(x=>{const m=x.split(/\s*[|｜]\s*/);return m.length>1?{p:m[0],t:m.slice(1).join(' ')}:{p:'',t:x}});
  const sc=get('予想点').match(/(\d(?:\.\d)?)/);const tr=get('書き起こし');
- const e={date:today(),score:sc?+sc[1]:null,heard:tr,words:(tr.match(/[A-Za-z']+/g)||[]).filter(w=>!/^(um+|uh+)$/i.test(w)).length,good:items(get('good')),dev:items(get('development')),model:get('模範解答'),next:get('次に直す'),para:items(get('言い換え')),phr:items(get('使えるフレーズ'))};
+ const e={date:today(),score:sc?+sc[1]:null,heard:tr,words:(tr.match(/[A-Za-z']+/g)||[]).filter(w=>!/^(um+|uh+)$/i.test(w)).length,good:items(get('good')),dev:items(get('development')),model:get('模範解答'),kata:items(get('型チェック')),next:get('次に直す'),para:items(get('言い換え')),phr:items(get('使えるフレーズ'))};
  if(!e.heard&&!e.good.length&&!e.dev.length)return null;return e}
 function ivFbCard(f){const card=h('div',{class:'fbrow'},h('div',{class:'k num'},f.score!=null?h('span',null,'予想点 ',h('b',{text:f.score+' / 5'})):null,h('span',null,'語数 ',h('b',{text:f.words+'語'})),f.secs?h('span',null,'時間 ',h('b',{text:Math.round(f.secs)+'秒'})):null,h('span',{class:'muted',text:f.date})));
  if(f.next)card.append(h('p',{style:'margin:6px 0',text:'次に直す1点：'+f.next}));
+ if(f.kata&&f.kata.length)card.append(h('div',{class:'kchk'},h('div',{class:'small muted',text:'型チェック'}),h('div',{class:'kchips'},f.kata.map(x=>{const ok=/^[○◯〇]/.test(x.t),mid=/^△/.test(x.t);return h('span',{class:'kc2 '+(ok?'ok':mid?'mid':'ng'),title:x.t,text:(x.p||'').replace(/\s+/g,' ')+' '+(ok?'○':mid?'△':'×')})})),f.kata.filter(x=>!/^[○◯〇]/.test(x.t)).map(x=>h('div',{class:'small',text:x.p+'：'+x.t}))));
  if(f.good.length)card.append(h('div',{class:'gd'},h('div',{class:'tag good',text:'Good'}),f.good.map(g=>h('div',{class:'pt'},g.p?h('div',{class:'en ph',text:g.p}):null,h('div',{text:g.t})))));
  if(f.dev.length)card.append(h('div',{class:'dv'},h('div',{class:'tag dev',text:'Development'}),f.dev.map(g=>h('div',{class:'pt'},g.p?h('div',{class:'en ph',text:g.p}):null,h('div',{text:g.t})))));
  if(f.para&&f.para.length)card.append(paraRows(f.para));
