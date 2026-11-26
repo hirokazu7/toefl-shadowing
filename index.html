@@ -268,7 +268,7 @@ async function flush(k){if(!(k in pend))return;const v=pend[k];delete pend[k];tr
  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PFX)&&k!==PFX+'cat'){const id=k.slice(PFX.length);if(!snap.docs.some(d=>d.id===id)){pend[id]=JSON.parse(localStorage.getItem(k));flush(id)}}}}catch(e){}
  rerender();}catch(e){}})();
 // ---------- settings & 4-day progress ----------
-const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true,wa:true,boost:2,ec:false};
+const DEF={rate:1,fs:20,pause:'off',view:'en',mk:true,wa:true,boost:2,ec:false,vp:true};
 function S(){return Object.assign({},DEF,LS.get('set',{}))}
 function setS(p){LS.set('set',Object.assign(S(),p))}
 function prog(id){const p=(LS.get('prog',{}))[id]||{};return {days:Object.assign({},p.days||{})}}
@@ -517,7 +517,7 @@ async function startRec(){
  if(!navigator.mediaDevices||!window.MediaRecorder){recMsg('このブラウザは録音に対応していません。iPhone なら Safari で開いてください。');return}
  if(LISTEN){try{LISTEN.abort()}catch(e){}LISTEN=null}
  setAudioSession('play-and-record');
- let stream;try{const c=S().ec?{echoCancellation:true,noiseSuppression:true,autoGainControl:true}:{echoCancellation:false,noiseSuppression:false,autoGainControl:false};c.channelCount=1;if(S().mic)c.deviceId={ideal:S().mic};stream=await navigator.mediaDevices.getUserMedia({audio:c})}catch(e){setAudioSession('auto');recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
+ let stream;try{const c=S().vp?{echoCancellation:true,noiseSuppression:true,autoGainControl:true}:{echoCancellation:false,noiseSuppression:false,autoGainControl:false};c.channelCount=1;if(S().mic)c.deviceId={ideal:S().mic};stream=await navigator.mediaDevices.getUserMedia({audio:c})}catch(e){setAudioSession('auto');recMsg('マイクが使えません。Safari の設定でこのサイトのマイクを許可してください。（'+e.name+'）');return}
  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
  const trk=stream.getAudioTracks()[0];
  const fail=m=>{try{stream.getTracks().forEach(t=>t.stop())}catch(e){}setAudioSession('playback');REC=null;recMsg(m);if(IT)renderPlayer()};
@@ -655,12 +655,12 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('p',{class:'small muted',text:'「文の長さ＋1秒」は Listen & Repeat の本番と同じ考え方。聞いた文と同じ長さの間に言い切る。'}),
   (()=>{const r=h('input',{type:'range',id:'boost',min:1,max:3,step:0.25,value:st.boost,'aria-label':'録音中の音量'});const v=h('b',{class:'num',text:'×'+(+st.boost).toFixed(2)});r.oninput=()=>{setS({boost:+r.value});v.textContent='×'+(+r.value).toFixed(2);if(GAIN&&REC)GAIN.gain.value=+r.value};return h('div',{class:'row'},h('span',{text:'録音中の音量'}),r,v)})(),
   h('div',{class:'row'},h('span',{text:'音の途切れ対策'}),seg('wa',[[true,'オン'],[false,'オフ']])),
-  h('div',{class:'row'},h('span',{text:'イヤホン'}),seg('ec',[[false,'あり'],[true,'なし']])),
+  h('div',{class:'row'},h('span',{text:'録音の音声処理'}),seg('vp',[[true,'オン'],[false,'オフ']])),
+  h('p',{class:'small muted',text:'オン：ノイズ除去と音量の自動調整をかける（LINE やビデオ会議と同じ処理）。Bluetooth イヤホンやイヤホンなしで録るときはオン。オフ：処理をかけない生の音。有線イヤホンで録るときはオフが一番自然な音になる。オンだと録音中にお手本の音が少し小さくなることがある。'}),
   (()=>{const sel=h('select',{id:'micSel','aria-label':'録音に使うマイク'},h('option',{value:'',text:'自動'}));sel.onchange=()=>setS({mic:sel.value});
    if(navigator.mediaDevices&&navigator.mediaDevices.enumerateDevices)navigator.mediaDevices.enumerateDevices().then(ds=>{ds.filter(d=>d.kind==='audioinput').forEach((d,i)=>sel.append(h('option',{value:d.deviceId,text:d.label||('マイク '+(i+1))})));sel.value=S().mic||''}).catch(()=>{});
    return h('div',{class:'row'},h('span',{text:'マイク'}),sel)})(),
   h('p',{class:'small muted',text:'Bluetooth イヤホンのマイクは音質が落ちて途切れやすい。「iPhone マイク」を選ぶと、iPhone 本体のマイクで録音する（名前は一度録音した後に表示される）。'}),
-  h('p',{class:'small muted',text:'イヤホンなしにすると、録音にお手本の音が入りにくくなる代わりに、iPhone がお手本の音量を下げます。添削の精度はイヤホンありの方が上です。'}),
   h('p',{class:'small muted',text:'オンだと再生の最初が切れにくく、録音中の音量も上げられます。音が出なくなったらオフにして、ページを読み込み直してください。'}),
   h('h3',{text:'表示',style:'margin-top:12px'}),
   h('div',{class:'row'},h('span',{text:'文字の大きさ'}),fs),
@@ -668,7 +668,7 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));
  sh.hidden=false;$('shade').hidden=false}
 function closeSheet(){$('sheet').hidden=true;$('shade').hidden=true;if(IT)renderPlayer();else renderHome()}
-const BUILD={"v": "11/25 12:29", "files": {"data.enc": "27edc8749ec911be", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
+const BUILD={"v": "11/27 00:11", "files": {"data.enc": "27edc8749ec911be", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f686abcdc7867dfd", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
 // GitHub 上のファイルが、この版で作ったものと同じかを確かめる
 async function siteCheck(out){const names=Object.keys(BUILD.files);if(!names.length){out.textContent='確認用の情報がありません。';return}
  const bad=[],miss=[];let n=0;
@@ -685,6 +685,9 @@ function gemSettings(){const st=S();const out=h('div',{class:'small',id:'gmOut',
   h('h3',{text:'記録のバックアップ',style:'margin-top:12px'}),
   h('p',{class:'small muted',text:'記録はこの端末のブラウザに保存されます。機種変更や履歴の削除の前に書き出してください（録音は含みません）。'}),
   h('div',{class:'row'},h('button',{class:'btn',type:'button',text:'書き出す',onclick:backupOut}),fi),bo,
+  h('h3',{text:'オフライン（機内・圏外で使う）',style:'margin-top:12px'}),
+  h('p',{class:'small muted',text:'ネットのある所で一度押すと、教材と音声（約20MB）をこの端末に保存して、機内モードでも開けるようになる。オフラインでできないのは Gemini 添削と音声認識（キーボードで答えればOK）。録音は保存され、あとで添削できる。'}),
+  (()=>{const o=h('div',{class:'small',id:'offOut',text:'確認中…'});const b=h('button',{class:'btn',type:'button',text:'オフライン用に保存'});b.onclick=()=>offSave(o,b);offCount().then(n=>{const t=offFiles().length;o.textContent=n>=t?'保存済み（'+n+' / '+t+'）':n?'一部だけ保存（'+n+' / '+t+'）。もう一度押してください。':'まだ保存していません。'});return h('div',{class:'row'},b,o)})(),
   h('h3',{text:'サイトの確認',style:'margin-top:12px'}),
   h('p',{class:'small muted',text:'この画面の版：'+BUILD.v+'。アップロードしたファイルに古いもの・抜けがないかを調べます（1分ほど）。'}),
   (()=>{const o=h('div',{class:'small',id:'chkOut'});return h('div',{class:'row'},h('button',{class:'btn',type:'button',text:'ファイルがそろっているか確認',onclick:()=>siteCheck(o)}),o)})()]}
@@ -918,7 +921,7 @@ async function ivBody(){const b=$('ivBody');if(!b)return;b.innerHTML='';const i=
 async function ivRec(){if(IVREC)return;ensureAC();if(LISTEN){try{LISTEN.abort()}catch(e){}LISTEN=null}
  if(!navigator.mediaDevices||!window.MediaRecorder){$('ivMsg')&&($('ivMsg').textContent='このブラウザは録音に対応していません。');return}
  setAudioSession('play-and-record');
- let stream;try{const c={echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1};if(S().mic)c.deviceId={ideal:S().mic};stream=await navigator.mediaDevices.getUserMedia({audio:c})}catch(e){setAudioSession('playback');const m=$('ivMsg');if(m)m.textContent='マイクが使えません（'+e.name+'）。';return}
+ let stream;try{const v=!!S().vp,c={echoCancellation:v,noiseSuppression:v,autoGainControl:v,channelCount:1};if(S().mic)c.deviceId={ideal:S().mic};stream=await navigator.mediaDevices.getUserMedia({audio:c})}catch(e){setAudioSession('playback');const m=$('ivMsg');if(m)m.textContent='マイクが使えません（'+e.name+'）。';return}
  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm'];const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
  const ivFail=m=>{try{stream.getTracks().forEach(t=>t.stop())}catch(e){}setAudioSession('playback');IVREC=null;ivBody();const x=$('ivMsg');if(x)x.textContent=m};
  let mr;try{mr=new MediaRecorder(stream,type?{mimeType:type}:undefined)}catch(e){try{mr=new MediaRecorder(stream)}catch(e2){return ivFail('録音を始められませんでした（'+e2.name+'）。')}}
@@ -1213,6 +1216,16 @@ async function boot(){
  let saved=null;try{saved=localStorage.getItem(PFX+'k')}catch(e){}
  if(saved){try{CRY.key=await crypto.subtle.importKey('raw',b64d(saved),{name:'AES-GCM'},false,['decrypt']);await loadData();renderHome();return}catch(e){}}
  lockScreen('')}
+// オフライン保存
+const OFFC='shd-offline';
+function offBase(){return location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,'')}
+function offFiles(){return [...new Set(['','index.html','meta.json','data.enc'].concat(Object.keys(BUILD.files||{})))]}
+async function offCount(){try{const c=await caches.open(OFFC),b=offBase();let n=0;for(const f of offFiles())if(await c.match(b+f))n++;return n}catch(e){return 0}}
+async function offSave(out,btn){if(!('caches' in window)||!navigator.serviceWorker){out.textContent='このブラウザはオフライン保存に対応していません。';return}
+ btn.disabled=true;const c=await caches.open(OFFC),b=offBase(),fs=offFiles();let n=0,bad=0;
+ for(const f of fs){try{const r=await fetch(b+f+'?v='+Date.now(),{cache:'no-store'});if(r.ok)await c.put(b+f,r);else bad++}catch(e){bad++}n++;out.textContent='保存中… '+n+' / '+fs.length}
+ btn.disabled=false;out.textContent=bad?'保存できなかったファイルが '+bad+' 個あります。電波の良い所でもう一度押してください。':'保存しました（'+fs.length+'個）。機内モードでも開けます。'}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 boot();
 </script>
 </body></html>
