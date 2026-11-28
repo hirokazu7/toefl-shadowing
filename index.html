@@ -223,6 +223,10 @@ input[type=text],input[type=password],input:not([type]),textarea,select{font-siz
 .kchk{margin:6px 0}.kchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
 .kc2{border-radius:999px;padding:2px 10px;font-size:13px;border:1px solid var(--line)}
 .kc2.ok{color:var(--good);border-color:var(--good)}.kc2.ng{color:var(--bad);border-color:var(--bad)}.kc2.mid{color:var(--muted)}
+.asents{display:flex;flex-direction:column;gap:6px}
+.asent{font-family:var(--en);font-size:17px;line-height:1.5;padding:4px 8px;border-radius:8px;border-left:3px solid transparent}
+.asent.on{background:var(--chip);border-left-color:var(--accent)}
+.asent.hid{color:transparent;background:var(--chip);user-select:none}.asent.hid.on{background:var(--line)}
 </style>
 </head><body><div id="home" class="wrap"></div>
 <div id="player" class="wrap player" hidden></div>
@@ -668,7 +672,7 @@ function openSheet(){const st=S();const sh=$('sheet');sh.innerHTML='';
   h('div',{class:'row',style:'justify-content:flex-end'},h('button',{class:'btn primary',type:'button',text:'閉じる',onclick:closeSheet})));
  sh.hidden=false;$('shade').hidden=false}
 function closeSheet(){$('sheet').hidden=true;$('shade').hidden=true;if(IT)renderPlayer();else renderHome()}
-const BUILD={"v": "11/27 01:45", "files": {"data.enc": "3c892c7ebb6ff689", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/iv_10.enc": "2923be2a99ef786a", "audio/iv_11.enc": "c39b68afd4c084e1", "audio/iv_12.enc": "bae9cb484e8626c8", "audio/iv_13.enc": "860687c590e89b51", "audio/iv_14.enc": "65984f1dd200b42f", "audio/iv_15.enc": "2858460d10bf7bdc", "audio/iv_16.enc": "b950f23cb1f49027", "audio/iv_17.enc": "e1768e90cc765329", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f0ab58874332cd78", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
+const BUILD={"v": "11/28 13:13", "files": {"data.enc": "3c892c7ebb6ff689", "meta.json": "7015bfb45284441e", "audio/ann1.enc": "913bf69ddf87f5c3", "audio/ann2.enc": "4a162a4f4d9239ec", "audio/ann3.enc": "4d147595ab270650", "audio/cD1.enc": "98588e4ec3d21e31", "audio/cD2.enc": "e3b88e99615d9a9e", "audio/cE1.enc": "4d0810679ae3f435", "audio/cE2.enc": "388823dd299a95f5", "audio/conv1.enc": "4e9801f5a0d9a25d", "audio/conv2.enc": "cf01deafa6d81a67", "audio/conv3.enc": "f9dacaf8cbc22ffe", "audio/iv1.enc": "798ff701abeb7e99", "audio/iv2.enc": "2947021560f7d951", "audio/iv3.enc": "4f6358f2ce343eee", "audio/iv4.enc": "83f0d32f176595a2", "audio/iv5.enc": "206977040db52261", "audio/iv6.enc": "704ef0c1457f0a41", "audio/iv7.enc": "11e4589bf1f95603", "audio/iv8.enc": "faa422ed2274eb51", "audio/iv_00.enc": "42cde7a0de605532", "audio/iv_01.enc": "6cad31b851b1f76e", "audio/iv_02.enc": "925d565eee042784", "audio/iv_03.enc": "64b1181a8cc69154", "audio/iv_04.enc": "24aea52d554ddf5c", "audio/iv_05.enc": "01c8b322fce506b8", "audio/iv_06.enc": "bf2853a0806e1dcf", "audio/iv_07.enc": "01be470ba3a9c57e", "audio/iv_08.enc": "5ea428d3653b0592", "audio/iv_09.enc": "a881798a00bb9e5e", "audio/iv_10.enc": "2923be2a99ef786a", "audio/iv_11.enc": "c39b68afd4c084e1", "audio/iv_12.enc": "bae9cb484e8626c8", "audio/iv_13.enc": "860687c590e89b51", "audio/iv_14.enc": "65984f1dd200b42f", "audio/iv_15.enc": "2858460d10bf7bdc", "audio/iv_16.enc": "b950f23cb1f49027", "audio/iv_17.enc": "e1768e90cc765329", "audio/lr03.enc": "f5e5b00f2dfe8c22", "audio/lr04.enc": "2c025abc51cbca77", "audio/lr05.enc": "8fe6ecfbd6183a43", "audio/lr06.enc": "ffa294be1d2950ca", "audio/lr07.enc": "95e450c7700780e1", "audio/lr08.enc": "0ca90eaf7b51b9c6", "audio/lr09.enc": "a273793cbd71cdf8", "audio/lr10.enc": "fbf6e6443197a91a", "audio/lr11.enc": "60a1d87196689b85", "audio/lr12.enc": "53246537c83addb9", "audio/lr13.enc": "aba88183680f4f37", "audio/lr14.enc": "e12247ed9e9ef1aa", "audio/lr15.enc": "d4f2c8d756418cec", "audio/lr16.enc": "f339114e417a6154", "audio/lr17.enc": "068c6f28938238aa", "audio/sk_b1.enc": "ffb91bd107eaa1f4", "audio/sk_b2.enc": "8e7d02815e996e10", "audio/sk_b3.enc": "4bc7578719ce3970", "audio/sk_b4.enc": "1a13248c955a37af", "audio/sk_b5.enc": "429475c7b6805825", "audio/sk_b6.enc": "cfbb8484cbe5393f", "audio/sk_b7.enc": "7711ad16b03cb00d", "audio/sk_b8.enc": "2e6e20a280a43ff0", "audio/sk_p1.enc": "f0ab58874332cd78", "audio/sk_p2.enc": "c34a083d56b872ab", "audio/sk_t1.enc": "48781fe2d10bb693", "audio/sk_t10.enc": "15f03194594b7c18", "audio/sk_t2.enc": "fbe3bb5adddc561b", "audio/sk_t3.enc": "7df202d8a5e88c6b", "audio/sk_t4.enc": "289bfa09927f2dec", "audio/sk_t5.enc": "df2016f9d33f0dca", "audio/sk_t6.enc": "dc5c401fcc474460", "audio/sk_t7.enc": "b32c88683c8dff3b", "audio/sk_t8.enc": "d0c20f82202e9d58", "audio/sk_t9.enc": "169c03253269a436", "audio/tA1.enc": "ceb6432f876a5d31", "audio/tA2.enc": "7090d726d41c357e", "audio/tA3.enc": "5c41a903e1bcf3b9", "audio/tB1.enc": "9186fe7365d53b5e", "audio/tB2.enc": "3c2a751100213441", "audio/tB3.enc": "88e536677ba89fd5", "audio/tC1.enc": "2015c71deee94115", "audio/tC2.enc": "1cae5aa1ce5a1c36", "audio/tC3.enc": "167e3e3ffdab4efd", "audio/talk1.enc": "bfe04dbbe766d1fd", "audio/talk2.enc": "d87d40160a9d86e0", "audio/talk3.enc": "522112f2f810065e", "audio/talk4.enc": "6fc3c43fc9b6698b"}};
 // GitHub 上のファイルが、この版で作ったものと同じかを確かめる
 async function siteCheck(out){const names=Object.keys(BUILD.files);if(!names.length){out.textContent='確認用の情報がありません。';return}
  const bad=[],miss=[];let n=0;
@@ -909,7 +913,8 @@ let IVS=null,IVREC=null;
 function ivModelBox(tp,i){const m=tp.m&&tp.m[i],ja=tp.qja&&tp.qja[i];const box=h('div');
  if(ja)box.append(h('details',{class:'typebox'},h('summary',{class:'small muted',text:'質問の日本語'}),h('p',{class:'small',text:ja})));
  if(m){const msg=h('span',{class:'small muted'});box.append(h('details',{class:'typebox'},h('summary',{class:'small muted',text:'模範解答（'+TYL[qty(tp,i)]+'の型どおり）'}),h('p',{class:'small en',style:'line-height:1.6',text:m}),
-  h('div',{class:'row'},h('button',{class:'minibtn',type:'button',text:'🔊 読み上げ',onclick:()=>sayEn(m)}),h('button',{class:'minibtn',type:'button',text:'模範解答をストック',onclick:()=>{msg.textContent=stockAdd('answers',{cat:'Interview・'+TYL[qty(tp,i)],q:tp.q[i].en,ja:ja||'',en:m})?'ストックしました':'ストック済みです'}}),msg)))}
+  h('div',{class:'row'},h('button',{class:'minibtn',type:'button',text:'🔊 読み上げ',onclick:()=>sayEn(m)}),h('button',{class:'minibtn',type:'button',text:'模範解答をストック',onclick:()=>{msg.textContent=stockAdd('answers',{cat:'Interview・'+TYL[qty(tp,i)],q:tp.q[i].en,ja:ja||'',en:m,qid:tp.id+':'+i})?'ストックしました':'ストック済みです'}}),msg)))}
+ box.append(myBox(tp,i));
  return box}
 function ivStart(tid){hideTabs();IVS={tp:SP.topics.find(t=>t.id===tid),i:0,memo:''};ivQ()}
 function ivKey(i){return 'iv:'+IVS.tp.id+':'+i+'|'+today()}
@@ -1099,21 +1104,24 @@ function stockAdd(kind,obj){const s=stockState();obj.id=kind[0]+Date.now().toStr
 function stockDue(kind){const t=today();return stockState()[kind].filter(x=>!x.due||x.due<=t)}
 function stockMark(kind,id,ok){const s=stockState();const x=s[kind].find(v=>v.id===id);if(!x)return;x.box=x.box||0;
  if(ok){x.box=Math.min(5,x.box+1);x.due=x.box>=5?addDays(30):addDays(BOXDAYS[x.box]||14)}else{x.box=0;x.due=addDays(1)}x.n=(x.n||0)+1;LS.set('stock',s);logN('stock')}
-function sayEn(t){return new Promise(res=>{try{quietOthers('tts');const u=new SpeechSynthesisUtterance(t.replace(/\[[^\]]*\]/g,'…'));u.lang='en-US';const v=speechSynthesis.getVoices().find(x=>/en-US/i.test(x.lang));if(v)u.voice=v;u.onend=res;u.onerror=res;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){res()}})}
+function sayEn(t,rate){return new Promise(res=>{try{quietOthers('tts');const u=new SpeechSynthesisUtterance(t.replace(/\[[^\]]*\]/g,'…'));u.lang='en-US';const vs=speechSynthesis.getVoices();const v=(S().ttsv&&vs.find(x=>x.name===S().ttsv))||vs.find(x=>/en-US/i.test(x.lang));if(v){u.voice=v;u.lang=v.lang}if(rate)u.rate=rate;u.onend=res;u.onerror=res;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){res()}})}
 let STK={tab:'phrases',cat:'すべて'};
 function renderStock(){const root=$('home');root.innerHTML='';const s=stockState();
  root.append(h('div',{class:'hometop'},h('h1',{text:'ストック'}),h('span',{class:'streak num',text:'🔥 '+streakDays()+'日'})),
   h('p',{class:'small muted',text:'何度も使えるフレーズと、添削でもらった模範解答をためて暗記する。Speaking でも Writing でも同じ言い回しを使い回す。'}));
- const seg=h('div',{class:'tabs4',style:'grid-template-columns:1fr 1fr'});[['phrases','フレーズ '+s.phrases.length],['answers','模範解答 '+s.answers.length]].forEach(([k,n])=>seg.append(h('button',{type:'button','aria-pressed':String(STK.tab===k),text:n,onclick:()=>{STK.tab=k;renderStock()}})));root.append(seg);
+ const seg=h('div',{class:'tabs4',style:'grid-template-columns:1fr 1fr'});[['phrases','フレーズ '+s.phrases.length],['answers','回答 '+s.answers.length]].forEach(([k,n])=>seg.append(h('button',{type:'button','aria-pressed':String(STK.tab===k),text:n,onclick:()=>{STK.tab=k;renderStock()}})));root.append(seg);
  const list=s[STK.tab],due=stockDue(STK.tab);
- const catList=()=>list.filter(x=>STK.tab!=='phrases'||STK.cat==='すべて'||x.cat===STK.cat);
+ const aOk=x=>STK.tab!=='answers'||!STK.acat||STK.acat==='all'||(STK.acat==='my'?!!x.my:!x.my);
+ const catList=()=>list.filter(x=>(STK.tab!=='phrases'||STK.cat==='すべて'||x.cat===STK.cat)&&aOk(x));
  root.append(h('div',{class:'skcards'},h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockPractice(STK.tab)},h('div',{class:'t',text:'暗記チェック'}),h('div',{class:'small muted',text:due.length?'今日の分 '+due.length+'件':'今日の分は終わり（全部から出す）'})),
   h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockPractice(STK.tab,catList())},h('div',{class:'t',text:'表示中を全部'}),h('div',{class:'small muted',text:'今の分類から連続で（期限は無視）'})),
   h('button',{class:'skcard'+(list.length?'':' dim'),type:'button',disabled:!list.length,onclick:()=>stockListen(catList())},h('div',{class:'t',text:'聞き流し'}),h('div',{class:'small muted',text:'日本語 → 英語を流しっぱなし'})),
   h('button',{class:'skcard',type:'button',onclick:()=>stockAddForm()},h('div',{class:'t',text:'＋ 追加'}),h('div',{class:'small muted',text:'MMBH や自分の表現を足す'}))));
+ if(STK.tab==='answers'){root.append(h('button',{class:'skcard'+(catList().length?'':' dim'),type:'button',style:'width:100%;margin:0 0 6px',disabled:!catList().length,onclick:()=>ansShadow(catList())},h('div',{class:'t',text:'回答シャドーイング'}),h('div',{class:'small muted',text:'表示中の回答を、見ながら重ねる → 隠して追いかける → 1文ずつ言う → 聞き流し'})));
+  const as=h('div',{class:'views',style:'margin:8px 0'});[['all','すべて'],['my','マイ回答'],['model','模範解答']].forEach(([v,n])=>as.append(h('button',{type:'button','aria-pressed':String((STK.acat||'all')===v),text:n+' '+list.filter(x=>v==='all'||(v==='my'?!!x.my:!x.my)).length,onclick:()=>{STK.acat=v;renderStock()}})));root.append(as)}
  if(STK.tab==='phrases'){const cats=['すべて',...new Set(list.map(x=>x.cat))];const cs=h('div',{class:'views',style:'margin:8px 0'});cats.forEach(c=>cs.append(h('button',{type:'button','aria-pressed':String(STK.cat===c),text:c,onclick:()=>{STK.cat=c;renderStock()}})));root.append(cs)}
  const box=h('div',{class:'list'});
- list.filter(x=>STK.tab!=='phrases'||STK.cat==='すべて'||x.cat===STK.cat).forEach(x=>{const del=h('button',{class:'linkbtn small',type:'button',text:'削除'});
+ catList().forEach(x=>{const del=h('button',{class:'linkbtn small',type:'button',text:'削除'});
   del.onclick=()=>{if(!del.dataset.arm){del.dataset.arm='1';del.textContent='もう一度押すと削除';return}const st=stockState();st[STK.tab]=st[STK.tab].filter(v=>v.id!==x.id);LS.set('stock',st);renderStock()};
   box.append(h('div',{class:'stockitem'},
    STK.tab==='answers'?h('div',{class:'small muted',text:(x.cat||'')+(x.q?'：'+x.q:'')}):h('div',{class:'small muted',text:x.cat+(x.src&&x.src!=='標準'?'・'+x.src:'')}),
@@ -1164,9 +1172,65 @@ function stockListenView(){const root=$('home');root.innerHTML='';const x=SL.lis
    h('button',{class:'btn',type:'button',text:'次へ',onclick:()=>{SL.i=Math.min(SL.list.length-1,SL.i+1);slRestart()}})))}
 function slRestart(){stopAllSpeak();SL.on=true;stockListenView();setTimeout(stockListenLoop,150)}
 async function stockListenLoop(){const my=Symbol();SL.tok=my;
- while(SL.on&&SL.tok===my){const x=SL.list[SL.i];if(x.ja||x.q)await sayJa(x.ja||x.q);if(!SL.on||SL.tok!==my)return;await new Promise(r=>setTimeout(r,1200));
+ while(SL.on&&SL.tok===my){const x=SL.list[SL.i];if(x.qid||(x.q&&!x.ja&&/[A-Za-z]/.test(x.q)))await qAudio(x);else if(x.ja||x.q)await sayJa(x.ja||x.q);if(!SL.on||SL.tok!==my)return;await new Promise(r=>setTimeout(r,1200));
   for(let k=0;k<2;k++){if(!SL.on||SL.tok!==my)return;await sayEn(x.ex||x.en);await new Promise(r=>setTimeout(r,900))}
   if(!SL.on||SL.tok!==my)return;SL.i=(SL.i+1)%SL.list.length;stockListenView()}}
+// ---------- マイ回答：自分で作った回答を整えて保存し、シャドーイング・聞き流しで覚える ----------
+function enVoices(){try{return speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang))}catch(e){return []}}
+function myFind(qid){return stockState().answers.find(x=>x.qid===qid&&x.my)}
+function mySave(tp,i,en){const qid=tp.id+':'+i,s=stockState(),ex=s.answers.find(x=>x.qid===qid&&x.my);
+ if(ex){ex.en=en;ex.box=0;ex.due=null;ex.created=today();LS.set('stock',s);return}
+ stockAdd('answers',{cat:'マイ回答・'+TYL[qty(tp,i)],q:tp.q[i].en,ja:(tp.qja&&tp.qja[i])||'',en,qid,my:1})}
+function myPrompt(tp,i,text){const ty=qty(tp,i);return ['あなたは TOEFL iBT（2026年からの新形式）の Speaking「Take an Interview」のコーチです。日本人学習者が、次の質問への回答を自分で書きました（日本語まじりのことがあります）。',
+ '本人の内容と経験をできるだけ活かして、45秒で話せる自然な英語に直してください。70〜85語。やさしい語と短めの文にして、口に出して覚えやすくする。事実を足しすぎない。',
+ '型（'+TYL[ty]+'）：'+kataSteps(ty).map(s=>s.n+s.t).join(' → '),
+ '質問：'+tp.q[i].en,'学習者の回答：'+text,
+ '必ず次の形だけで答える（前置きは書かない）：','【直した回答】','（英文）','【直した点】','- （元の表現） | （直した表現。理由を日本語で短く）','（最大4つ）','【覚えるフレーズ】','- （英語の言い回し） | （日本語の意味）','（2〜3個）'].join('\n')}
+function myParse(txt){const t=txt.replace(/\r/g,'').replace(/\*\*/g,'');const parts=t.split(/【([^】]+)】/);const sec={};for(let k=1;k<parts.length;k+=2)sec[parts[k].trim()]=(parts[k+1]||'').trim();
+ const get=k=>{const key=Object.keys(sec).find(x=>x.includes(k));return key?sec[key]:''};
+ const items=s=>s.split('\n').map(x=>x.trim()).filter(x=>/^[-・*•]/.test(x)).map(x=>{const m=x.replace(/^[-・*•]\s*/,'').split(/\s*[|｜]\s*/);return {p:m[0],t:m.slice(1).join(' ')}});
+ const en=get('直した回答').split('\n').filter(l=>l.trim()&&!/^（/.test(l)).join(' ').trim();return en?{en,notes:items(get('直した点')),phr:items(get('覚えるフレーズ'))}:null}
+function myBox(tp,i){const qid=tp.id+':'+i,saved=myFind(qid);
+ const ta=h('textarea',{class:'pastebox',id:'myText',placeholder:'型の順番で、自分の答えを書く（日本語まじりでもOK）',style:'min-height:120px'});ta.value=(saved&&saved.en)||'';
+ const wc=h('span',{class:'small muted num'});const upd=()=>{wc.textContent=(ta.value.match(/[A-Za-z']+/g)||[]).length+'語（目標 70〜85語）'};ta.oninput=upd;upd();
+ const msg=h('p',{class:'small'}),out=h('div');
+ const fix=h('button',{class:'btn primary',type:'button',text:'Gemini で整える'});
+ fix.onclick=async()=>{const t=ta.value.trim();if(!t){msg.textContent='先に回答を書いてください。';return}if(!S().gkey){msg.textContent='設定で Gemini の API キーを入れてください（オフライン中は「このまま保存」だけ使えます）。';return}
+  fix.disabled=true;msg.textContent='Gemini に送っています…';
+  try{const r=myParse(await gemCall([{text:myPrompt(tp,i,t)}],false,s=>{msg.textContent=s}));fix.disabled=false;if(!r){msg.textContent='返事を読み取れませんでした。もう一度押してください。';return}msg.textContent='';out.innerHTML='';
+   out.append(h('div',{class:'anscard'},h('div',{class:'small muted',text:'整えた回答（'+(r.en.match(/[A-Za-z']+/g)||[]).length+'語）'}),h('div',{class:'en',style:'line-height:1.6;margin:4px 0',text:r.en}),
+    r.notes.length?h('div',{class:'small'},r.notes.map(n=>h('div',{text:'・'+n.p+' → '+n.t}))):null,
+    h('div',{class:'row'},h('button',{class:'minibtn',type:'button',text:'🔊',onclick:()=>sayEn(r.en)}),h('button',{class:'btn primary',type:'button',text:'この回答を保存',onclick:()=>{mySave(tp,i,r.en);ta.value=r.en;upd();msg.textContent='保存しました。ストック →「回答シャドーイング」で覚える。';out.innerHTML=''}}))),
+    r.phr.length?h('div',{class:'gd'},h('div',{class:'tag good',text:'覚えるフレーズ'}),r.phr.map(p=>phraseRow(p,'マイ回答'))):null)}
+  catch(e){fix.disabled=false;msg.textContent='整えられませんでした：'+(e.message||e)}};
+ const keep=h('button',{class:'btn',type:'button',text:'このまま保存',onclick:()=>{const t=ta.value.trim();if(!t){msg.textContent='先に回答を書いてください。';return}mySave(tp,i,t);msg.textContent='保存しました。ストック →「回答シャドーイング」で覚える。'}});
+ return h('details',{class:'typebox',open:!!saved},h('summary',{class:'small',style:'font-weight:700',text:'自分の回答を作る'+(saved?'（保存済み）':'')}),ta,wc,h('div',{class:'row'},keep,fix),msg,out)}
+// 質問の音声（qid があれば録音済みの質問、なければ読み上げ）
+function qAudio(x){if(x.qid){const [tid,qi]=x.qid.split(':');const tp=SP.topics.find(t=>t.id===tid);if(tp&&tp.q[+qi])return playSeg('iv_'+tid.slice(2),tp.q[+qi].s,tp.q[+qi].e)}return x.q?sayEn(x.q):Promise.resolve(true)}
+function splitSent(t){return (t.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g)||[t]).map(x=>x.trim()).filter(Boolean)}
+const SA={on:false,list:[],i:0,mode:'see',rate:0.9,n:0,cur:-1};
+function ansShadow(list){hideTabs();if(!list.length)return;SA.list=list;SA.i=0;SA.on=false;SA.cur=-1;SA.n=0;ansView()}
+function ansView(){const root=$('home');root.innerHTML='';const x=SA.list[SA.i],ss=splitSent(x.en);
+ root.append(h('div',{class:'top'},h('button',{class:'iconbtn',type:'button','aria-label':'戻る',html:ICON.back,onclick:()=>{SA.on=false;stopAllSpeak();renderHome()}}),h('div',{class:'ttl'},h('div',{text:'回答シャドーイング'}),h('div',{class:'small muted num',text:(SA.i+1)+' / '+SA.list.length+(SA.n?'・この回答 '+SA.n+'回':'')}))));
+ const seg=(arr,key,re)=>h('div',{class:'cats',style:'margin:6px 0'},arr.map(([v,n])=>h('button',{type:'button','aria-pressed':String(SA[key]===v),text:n,onclick:()=>{SA[key]=v;if(re){SA.on=false;stopAllSpeak()}ansView()}})));
+ root.append(seg([['see','① 見ながら重ねる'],['hide','② 隠して追いかける'],['gap','③ 1文ずつ言う'],['listen','④ 質問→回答の聞き流し']],'mode',true),seg([[0.8,'ゆっくり'],[0.9,'少しゆっくり'],[1,'ふつう']],'rate',true));
+ const help={see:'英文を見ながら、音と同時に読む。リズムと区切りをつかむ。',hide:'英文を隠して、少し遅れて追いかける。ここまで来たら半分覚えている。',gap:'1文流れたら止まるので、同じ文を言う。言えない文が覚えどころ。',listen:'質問 → 回答を流しっぱなし。家事や移動中に。'}[SA.mode];
+ root.append(h('p',{class:'small muted',style:'margin:2px'},help));
+ root.append(h('div',{class:'qcard'},h('div',{class:'row',style:'margin:0;justify-content:space-between'},h('span',{class:'small muted',text:x.cat||''}),h('button',{class:'minibtn',type:'button',text:'🔊 質問',onclick:()=>{SA.on=false;stopAllSpeak();ansView();qAudio(x)}})),h('div',{class:'small en',style:'margin:4px 0 10px',text:x.q||''}),
+  h('div',{class:'asents'},ss.map((t,k)=>h('div',{class:'asent'+(k===SA.cur?' on':'')+(SA.mode==='hide'&&SA.on?' hid':''),text:t})))));
+ const vs=enVoices();if(vs.length>1){const sel=h('select',{id:'ttsv','aria-label':'読み上げの声',style:'max-width:100%'},vs.map(v=>h('option',{value:v.name,text:v.name+'（'+v.lang+'）'})));sel.value=S().ttsv||'';if(!sel.value)sel.selectedIndex=Math.max(0,vs.findIndex(v=>/en-US/i.test(v.lang)));sel.onchange=()=>setS({ttsv:sel.value});root.append(h('div',{class:'row'},h('span',{class:'small',text:'声'}),sel))}
+ root.append(h('div',{class:'row',style:'justify-content:center;margin-top:12px'},
+  h('button',{class:'btn',type:'button',text:'← 前',onclick:()=>{SA.on=false;stopAllSpeak();SA.i=(SA.i-1+SA.list.length)%SA.list.length;SA.n=0;SA.cur=-1;ansView()}}),
+  h('button',{class:'btn primary',type:'button',text:SA.on?'■ 止める':'▶ 再生',onclick:()=>{if(SA.on){SA.on=false;stopAllSpeak();SA.cur=-1;ansView()}else{SA.on=true;ansView();ansLoop()}}}),
+  h('button',{class:'btn',type:'button',text:'次 →',onclick:()=>{SA.on=false;stopAllSpeak();SA.i=(SA.i+1)%SA.list.length;SA.n=0;SA.cur=-1;ansView()}})))}
+function ansMark(){document.querySelectorAll('.asent').forEach((e,k)=>e.classList.toggle('on',k===SA.cur))}
+async function ansLoop(){const my=Symbol();SA.tok=my;const alive=()=>SA.on&&SA.tok===my;
+ while(alive()){const x=SA.list[SA.i],ss=splitSent(x.en);
+  if(SA.mode==='listen'){await qAudio(x);if(!alive())return;await gwait(800)}
+  for(let k=0;k<ss.length&&alive();k++){SA.cur=k;ansMark();const t0=Date.now();await sayEn(ss[k],SA.rate);if(!alive())return;
+   if(SA.mode==='gap')await gwait(Date.now()-t0+1200);else await gwait(150)}
+  if(!alive())return;SA.cur=-1;SA.n++;await gwait(1500);if(!alive())return;
+  if(SA.mode==='listen'){SA.i=(SA.i+1)%SA.list.length;SA.n=0}ansView()}}
 function stockDone(){const root=$('home');root.innerHTML='';root.append(h('div',{class:'sumbox'},h('div',{class:'streakbig num',text:'🔥 '+streakDays()+' day'}),h('div',{class:'big num',text:STP.ok+' / '+STP.list.length}),h('p',{class:'small muted',text:'言えなかったものは明日また出ます。'})),
  h('div',{class:'row',style:'justify-content:center'},h('button',{class:'btn',type:'button',text:'ストックへ',onclick:()=>{STP=null;renderHome()}})))}
 function phraseRow(p,src){const b=h('button',{class:'minibtn',type:'button',text:'＋ストック'});b.onclick=()=>{const ok=stockAdd('phrases',{cat:src,ja:p.t||'',en:p.p||p.t,src:'添削'});b.textContent=ok?'追加済み':'登録済み';b.disabled=true};
